@@ -17,7 +17,20 @@
 3. **Legal text** (Terms, Privacy, DPDP notice) — I will scaffold structure only, with placeholders marked clearly. A lawyer fills the text. I will not invent legal language.
 4. **Truth rules adopted:** no fake metrics, no testimonials, no customer logos, no counters, no "verified/certified/secure/bug-free" claims. Empty states when there is no real data.
 
-## 2. Phase plan (one phase per approval, each with proof)
+## 2. Your infrastructure — what I saw and what to do with it
+
+From your screenshots: GitHub account, a Supabase org (project `nextora-prod`), AWS Lightsail (ap-south-1), GoDaddy domain `prelaunchqa.com` (currently parked, GoDaddy nameservers).
+
+| You have | Use it for | Action needed |
+| --- | --- | --- |
+| GitHub | Code backup + the scan-worker repo | Connect this project to GitHub from the Lovable top bar |
+| Supabase | Database, auth, storage | Do NOT reuse `nextora-prod`. Either enable Lovable Cloud (fresh managed database, zero setup — my recommendation) or create a separate `prelaunchqa-prod` Supabase project and connect it in Project Settings → Connectors |
+| AWS Lightsail | The Playwright scan workers (Phase 2) | Nothing yet. At Phase 2: 2 GB RAM Ubuntu instance, ap-south-1, Node LTS + Chromium deps |
+| GoDaddy `prelaunchqa.com` | Live site | Nothing yet. After Phase 0 is published I give you the exact DNS records to add |
+
+**Nothing else is needed to start Phase 0.** Payment keys are needed at Phase 4, the Lightsail server at Phase 2.
+
+## 3. Phase plan (one phase per approval, each with proof)
 
 ### Phase 0 — Landing + waitlist + pre-order (gate G0)
 - Brand system in code: Ink background, Violet/Mint/Coral/Amber tokens, Sora headlines
@@ -58,13 +71,13 @@ Phase 6 (outreach with human approval gate) only after G2 passes.
 
 At the end of every phase I give you: files changed, commands run with raw output, what is NOT done, and the exact steps for you to verify yourself.
 
-## 3. Technical notes
+## 4. Technical notes
 
 - Stack: TanStack Start + Lovable Cloud (Postgres, auth, storage, RLS). Cloud is enabled in Phase 0.
 - Scan workers stay external on Node LTS, communicating over a signed public API route.
 - Large evidence files go to Cloud storage rather than the database.
 - Severity rules live in a single source file, not scattered in components.
 
-## 4. Approve to start
+## 5. Approve to start
 
 Approving starts **Phase 0 only**. I stop at the end of it and report before touching Phase 1.
