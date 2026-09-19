@@ -13,6 +13,9 @@ export function SiteHeader() {
           <Link to="/preorder" className="transition hover:text-foreground">
             Pre-order
           </Link>
+          <Link to="/auth" className="transition hover:text-foreground">
+            Sign in
+          </Link>
           <Link
             to="/preorder"
             className="rounded-lg bg-primary px-4 py-2 font-medium text-primary-foreground transition hover:brightness-110"
