@@ -14,7 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      waitlist: {
+        Row: {
+          builder: string | null
+          consent_marketing: boolean
+          created_at: string
+          email: string
+          id: string
+          intent: string
+          ip_hash: string | null
+          website_url: string | null
+        }
+        Insert: {
+          builder?: string | null
+          consent_marketing?: boolean
+          created_at?: string
+          email: string
+          id?: string
+          intent?: string
+          ip_hash?: string | null
+          website_url?: string | null
+        }
+        Update: {
+          builder?: string | null
+          consent_marketing?: boolean
+          created_at?: string
+          email?: string
+          id?: string
+          intent?: string
+          ip_hash?: string | null
+          website_url?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
