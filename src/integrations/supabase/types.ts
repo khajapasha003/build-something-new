@@ -14,6 +14,104 @@ export type Database = {
   }
   public: {
     Tables: {
+      apps: {
+        Row: {
+          built_with: string | null
+          created_at: string
+          id: string
+          origin: string
+          updated_at: string
+          url: string
+          user_id: string
+          verification_status: string
+          verification_token: string
+          verified_at: string | null
+        }
+        Insert: {
+          built_with?: string | null
+          created_at?: string
+          id?: string
+          origin: string
+          updated_at?: string
+          url: string
+          user_id: string
+          verification_status?: string
+          verification_token?: string
+          verified_at?: string | null
+        }
+        Update: {
+          built_with?: string | null
+          created_at?: string
+          id?: string
+          origin?: string
+          updated_at?: string
+          url?: string
+          user_id?: string
+          verification_status?: string
+          verification_token?: string
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      verification_attempts: {
+        Row: {
+          app_id: string
+          created_at: string
+          id: string
+          method: string
+          reason: string | null
+          result: string
+          user_id: string
+        }
+        Insert: {
+          app_id: string
+          created_at?: string
+          id?: string
+          method: string
+          reason?: string | null
+          result: string
+          user_id: string
+        }
+        Update: {
+          app_id?: string
+          created_at?: string
+          id?: string
+          method?: string
+          reason?: string | null
+          result?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "verification_attempts_app_id_fkey"
+            columns: ["app_id"]
+            isOneToOne: false
+            referencedRelation: "apps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       waitlist: {
         Row: {
           builder: string | null
