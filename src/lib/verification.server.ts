@@ -106,6 +106,12 @@ async function dohQuery(name: string, type: "A" | "AAAA" | "TXT"): Promise<DohAn
 /** Resolves a host and fails closed if it does not resolve or any address is private. */
 export async function assertPublicHost(host: string): Promise<{ ok: true } | { ok: false; reason: string }> {
   if (isBlockedHostname(host)) return { ok: false, reason: `Blocked hostname: ${host}` };
+  const literal = host.replace(/^\[|\]$/g, "");
+  if (/^\d{1,3}(\.\d{1,3}){3}$/.test(literal) || literal.includes(":")) {
+    return isBlockedIp(literal)
+      ? { ok: false, reason: `Blocked IP address: ${literal}` }
+      : { ok: false, reason: "Only domain names can be verified, not raw IP addresses" };
+  }
   const [a, aaaa] = await Promise.all([dohQuery(host, "A"), dohQuery(host, "AAAA")]);
   const ips = [...a, ...aaaa]
     .filter((ans) => ans.type === 1 || ans.type === 28)
