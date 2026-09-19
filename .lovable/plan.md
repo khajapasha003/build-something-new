@@ -71,13 +71,13 @@ Phase 6 (outreach with human approval gate) only after G2 passes.
 
 At the end of every phase I give you: files changed, commands run with raw output, what is NOT done, and the exact steps for you to verify yourself.
 
-## 3. Technical notes
+## 4. Technical notes
 
 - Stack: TanStack Start + Lovable Cloud (Postgres, auth, storage, RLS). Cloud is enabled in Phase 0.
 - Scan workers stay external on Node LTS, communicating over a signed public API route.
 - Large evidence files go to Cloud storage rather than the database.
 - Severity rules live in a single source file, not scattered in components.
 
-## 4. Approve to start
+## 5. Approve to start
 
 Approving starts **Phase 0 only**. I stop at the end of it and report before touching Phase 1.
