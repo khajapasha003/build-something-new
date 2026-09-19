@@ -36,9 +36,9 @@ export const Route = createFileRoute("/_authenticated/app")({
 });
 
 const STATUS_STYLES: Record<AppRow["verification_status"], string> = {
-  verified: "border-[hsl(var(--status-pass))]/40 bg-[hsl(var(--status-pass))]/10 text-[hsl(var(--status-pass))]",
-  pending: "border-[hsl(var(--status-warn))]/40 bg-[hsl(var(--status-warn))]/10 text-[hsl(var(--status-warn))]",
-  failed: "border-[hsl(var(--status-fail))]/40 bg-[hsl(var(--status-fail))]/10 text-[hsl(var(--status-fail))]",
+  verified: "border-mint/40 bg-mint/10 text-mint",
+  pending: "border-amber/40 bg-amber/10 text-amber",
+  failed: "border-coral/40 bg-coral/10 text-coral",
 };
 
 const STATUS_LABEL: Record<AppRow["verification_status"], string> = {
@@ -321,8 +321,8 @@ function Dashboard() {
                         <p
                           className={`text-sm ${
                             verifyMessage.ok
-                              ? "text-[hsl(var(--status-pass))]"
-                              : "text-[hsl(var(--status-fail))]"
+                              ? "text-mint"
+                              : "text-coral"
                           }`}
                         >
                           {verifyMessage.text}
