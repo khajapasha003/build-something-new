@@ -2,8 +2,12 @@
 
 - [x] Audit uploads (logo, brand sheet, build plan, demo video) and current project
 - [x] Confirm available infrastructure: GitHub, Supabase, AWS Lightsail, GoDaddy (prelaunchqa.com)
-- [ ] Get plan approval
-- [ ] Phase 0 — brand system, landing page, waitlist + pre-order, legal page shells
+- [x] Get plan approval
+- [x] Phase 0 — brand system, landing page, waitlist + pre-order, legal page shells
+  - [x] Brand tokens (Ink/Violet/Mint/Coral/Amber), Sora + Manrope, favicon from logo
+  - [x] `waitlist` table, server-only RLS, 5-per-hour rate limit on hashed IP
+  - [x] Routes `/`, `/preorder`, `/terms`, `/privacy` + demo video; verified 200/404 and one real submit
+  - [ ] Publish + point prelaunchqa.com at it (needs your go-ahead)
 - [ ] Phase 1 — auth, targets, domain ownership verification (A1)
 - [ ] Phase 2 — scan jobs, findings schema, signed worker API, worker starter repo
 - [ ] Phase 3 — report UI with evidence, re-scan diff
