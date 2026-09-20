@@ -17,6 +17,8 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
 import { Route as ApiPublicWorkerClaimRouteImport } from './routes/api/public/worker/claim'
+import { Route as ApiPublicWorkerProgressRouteImport } from './routes/api/public/worker/progress'
+import { Route as ApiPublicWorkerResultRouteImport } from './routes/api/public/worker/result'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -57,6 +59,16 @@ const ApiPublicWorkerClaimRoute = ApiPublicWorkerClaimRouteImport.update({
   path: '/api/public/worker/claim',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicWorkerProgressRoute = ApiPublicWorkerProgressRouteImport.update({
+  id: '/api/public/worker/progress',
+  path: '/api/public/worker/progress',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicWorkerResultRoute = ApiPublicWorkerResultRouteImport.update({
+  id: '/api/public/worker/result',
+  path: '/api/public/worker/result',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -66,6 +78,8 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/app': typeof AuthenticatedAppRoute
   '/api/public/worker/claim': typeof ApiPublicWorkerClaimRoute
+  '/api/public/worker/progress': typeof ApiPublicWorkerProgressRoute
+  '/api/public/worker/result': typeof ApiPublicWorkerResultRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -75,6 +89,8 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/app': typeof AuthenticatedAppRoute
   '/api/public/worker/claim': typeof ApiPublicWorkerClaimRoute
+  '/api/public/worker/progress': typeof ApiPublicWorkerProgressRoute
+  '/api/public/worker/result': typeof ApiPublicWorkerResultRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -86,6 +102,8 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/_authenticated/app': typeof AuthenticatedAppRoute
   '/api/public/worker/claim': typeof ApiPublicWorkerClaimRoute
+  '/api/public/worker/progress': typeof ApiPublicWorkerProgressRoute
+  '/api/public/worker/result': typeof ApiPublicWorkerResultRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -97,6 +115,8 @@ export interface FileRouteTypes {
     | '/terms'
     | '/app'
     | '/api/public/worker/claim'
+    | '/api/public/worker/progress'
+    | '/api/public/worker/result'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -106,6 +126,8 @@ export interface FileRouteTypes {
     | '/terms'
     | '/app'
     | '/api/public/worker/claim'
+    | '/api/public/worker/progress'
+    | '/api/public/worker/result'
   id:
     | '__root__'
     | '/'
@@ -116,6 +138,8 @@ export interface FileRouteTypes {
     | '/terms'
     | '/_authenticated/app'
     | '/api/public/worker/claim'
+    | '/api/public/worker/progress'
+    | '/api/public/worker/result'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -126,6 +150,8 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
   ApiPublicWorkerClaimRoute: typeof ApiPublicWorkerClaimRoute
+  ApiPublicWorkerProgressRoute: typeof ApiPublicWorkerProgressRoute
+  ApiPublicWorkerResultRoute: typeof ApiPublicWorkerResultRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -186,6 +212,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicWorkerClaimRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/worker/progress': {
+      id: '/api/public/worker/progress'
+      path: '/api/public/worker/progress'
+      fullPath: '/api/public/worker/progress'
+      preLoaderRoute: typeof ApiPublicWorkerProgressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/worker/result': {
+      id: '/api/public/worker/result'
+      path: '/api/public/worker/result'
+      fullPath: '/api/public/worker/result'
+      preLoaderRoute: typeof ApiPublicWorkerResultRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -208,6 +248,8 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
   ApiPublicWorkerClaimRoute: ApiPublicWorkerClaimRoute,
+  ApiPublicWorkerProgressRoute: ApiPublicWorkerProgressRoute,
+  ApiPublicWorkerResultRoute: ApiPublicWorkerResultRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
