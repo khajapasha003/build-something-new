@@ -53,6 +53,63 @@ export type Database = {
         }
         Relationships: []
       }
+      findings: {
+        Row: {
+          app_id: string
+          created_at: string
+          detail: string | null
+          evidence: Json
+          id: string
+          page_url: string | null
+          rule_id: string
+          scan_id: string
+          severity: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          app_id: string
+          created_at?: string
+          detail?: string | null
+          evidence?: Json
+          id?: string
+          page_url?: string | null
+          rule_id: string
+          scan_id: string
+          severity: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          app_id?: string
+          created_at?: string
+          detail?: string | null
+          evidence?: Json
+          id?: string
+          page_url?: string | null
+          rule_id?: string
+          scan_id?: string
+          severity?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "findings_app_id_fkey"
+            columns: ["app_id"]
+            isOneToOne: false
+            referencedRelation: "apps"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "findings_scan_id_fkey"
+            columns: ["scan_id"]
+            isOneToOne: false
+            referencedRelation: "scans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -73,6 +130,112 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      scan_events: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          progress: number | null
+          scan_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          progress?: number | null
+          scan_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          progress?: number | null
+          scan_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scan_events_scan_id_fkey"
+            columns: ["scan_id"]
+            isOneToOne: false
+            referencedRelation: "scans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      scans: {
+        Row: {
+          app_id: string
+          bug_count: number
+          claim_token: string | null
+          claimed_at: string | null
+          created_at: string
+          error: string | null
+          finished_at: string | null
+          id: string
+          needs_review_count: number
+          passed_count: number
+          progress: number
+          progress_message: string | null
+          started_at: string | null
+          status: string
+          target_url: string
+          updated_at: string
+          user_id: string
+          worker_id: string | null
+        }
+        Insert: {
+          app_id: string
+          bug_count?: number
+          claim_token?: string | null
+          claimed_at?: string | null
+          created_at?: string
+          error?: string | null
+          finished_at?: string | null
+          id?: string
+          needs_review_count?: number
+          passed_count?: number
+          progress?: number
+          progress_message?: string | null
+          started_at?: string | null
+          status?: string
+          target_url: string
+          updated_at?: string
+          user_id: string
+          worker_id?: string | null
+        }
+        Update: {
+          app_id?: string
+          bug_count?: number
+          claim_token?: string | null
+          claimed_at?: string | null
+          created_at?: string
+          error?: string | null
+          finished_at?: string | null
+          id?: string
+          needs_review_count?: number
+          passed_count?: number
+          progress?: number
+          progress_message?: string | null
+          started_at?: string | null
+          status?: string
+          target_url?: string
+          updated_at?: string
+          user_id?: string
+          worker_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scans_app_id_fkey"
+            columns: ["app_id"]
+            isOneToOne: false
+            referencedRelation: "apps"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       verification_attempts: {
         Row: {
