@@ -3,9 +3,12 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 
 import {
+  compareScan,
   getScan,
   listFindings,
+  type ComparisonItem,
   type FindingRow,
+  type ScanComparison,
   type ScanRow,
 } from "@/lib/scans.functions";
 
