@@ -110,8 +110,17 @@ function Dashboard() {
   const createApp = useServerFn(addApp);
   const removeApp = useServerFn(deleteApp);
   const runVerify = useServerFn(verifyApp);
+  const fetchScans = useServerFn(listScans);
+  const startScan = useServerFn(requestScan);
+  const stopScan = useServerFn(cancelScan);
 
   const appsQuery = useQuery({ queryKey: ["apps"], queryFn: () => fetchApps() });
+  const scansQuery = useQuery({
+    queryKey: ["scans"],
+    queryFn: () => fetchScans(),
+    refetchInterval: (query) =>
+      (query.state.data ?? []).some(isActive) ? 4000 : false,
+  });
 
   const [url, setUrl] = useState("");
   const [builtWith, setBuiltWith] = useState<(typeof BUILT_WITH)[number]>("Lovable");
@@ -123,8 +132,17 @@ function Dashboard() {
   const [verifyMessage, setVerifyMessage] = useState<{ appId: string; ok: boolean; text: string } | null>(
     null,
   );
+  const [scanMessage, setScanMessage] = useState<{ appId: string; text: string } | null>(null);
 
   const apps = appsQuery.data ?? [];
+  const scans = scansQuery.data ?? [];
+
+  async function onRunCheck(app: AppRow) {
+    setScanMessage(null);
+    const result = await startScan({ data: { appId: app.id } });
+    if (!result.ok) setScanMessage({ appId: app.id, text: result.error });
+    await queryClient.invalidateQueries({ queryKey: ["scans"] });
+  }
 
   async function onAdd(event: React.FormEvent) {
     event.preventDefault();
