@@ -16,6 +16,7 @@ import { Route as PreorderRouteImport } from './routes/preorder'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
+import { Route as AuthenticatedReportScanIdRouteImport } from './routes/_authenticated/report.$scanId'
 import { Route as ApiPublicWorkerClaimRouteImport } from './routes/api/public/worker/claim'
 import { Route as ApiPublicWorkerProgressRouteImport } from './routes/api/public/worker/progress'
 import { Route as ApiPublicWorkerResultRouteImport } from './routes/api/public/worker/result'
@@ -54,6 +55,12 @@ const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
   path: '/app',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedReportScanIdRoute =
+  AuthenticatedReportScanIdRouteImport.update({
+    id: '/report/$scanId',
+    path: '/report/$scanId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const ApiPublicWorkerClaimRoute = ApiPublicWorkerClaimRouteImport.update({
   id: '/api/public/worker/claim',
   path: '/api/public/worker/claim',
@@ -77,6 +84,7 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/app': typeof AuthenticatedAppRoute
+  '/report/$scanId': typeof AuthenticatedReportScanIdRoute
   '/api/public/worker/claim': typeof ApiPublicWorkerClaimRoute
   '/api/public/worker/progress': typeof ApiPublicWorkerProgressRoute
   '/api/public/worker/result': typeof ApiPublicWorkerResultRoute
@@ -88,6 +96,7 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/app': typeof AuthenticatedAppRoute
+  '/report/$scanId': typeof AuthenticatedReportScanIdRoute
   '/api/public/worker/claim': typeof ApiPublicWorkerClaimRoute
   '/api/public/worker/progress': typeof ApiPublicWorkerProgressRoute
   '/api/public/worker/result': typeof ApiPublicWorkerResultRoute
@@ -101,6 +110,7 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/_authenticated/app': typeof AuthenticatedAppRoute
+  '/_authenticated/report/$scanId': typeof AuthenticatedReportScanIdRoute
   '/api/public/worker/claim': typeof ApiPublicWorkerClaimRoute
   '/api/public/worker/progress': typeof ApiPublicWorkerProgressRoute
   '/api/public/worker/result': typeof ApiPublicWorkerResultRoute
@@ -114,6 +124,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/terms'
     | '/app'
+    | '/report/$scanId'
     | '/api/public/worker/claim'
     | '/api/public/worker/progress'
     | '/api/public/worker/result'
@@ -125,6 +136,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/terms'
     | '/app'
+    | '/report/$scanId'
     | '/api/public/worker/claim'
     | '/api/public/worker/progress'
     | '/api/public/worker/result'
@@ -137,6 +149,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/terms'
     | '/_authenticated/app'
+    | '/_authenticated/report/$scanId'
     | '/api/public/worker/claim'
     | '/api/public/worker/progress'
     | '/api/public/worker/result'
@@ -205,6 +218,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/report/$scanId': {
+      id: '/_authenticated/report/$scanId'
+      path: '/report/$scanId'
+      fullPath: '/report/$scanId'
+      preLoaderRoute: typeof AuthenticatedReportScanIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/public/worker/claim': {
       id: '/api/public/worker/claim'
       path: '/api/public/worker/claim'
@@ -231,10 +251,12 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAppRoute: typeof AuthenticatedAppRoute
+  AuthenticatedReportScanIdRoute: typeof AuthenticatedReportScanIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAppRoute: AuthenticatedAppRoute,
+  AuthenticatedReportScanIdRoute: AuthenticatedReportScanIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
