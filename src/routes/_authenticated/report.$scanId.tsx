@@ -99,6 +99,12 @@ function ReportPage() {
     enabled: Boolean(done),
   });
 
+  const compareQuery = useQuery({
+    queryKey: ["scan-compare", scanId],
+    queryFn: () => fetchComparison({ data: { scanId } }),
+    enabled: Boolean(done),
+  });
+
   if (scanQuery.isLoading) {
     return (
       <Shell>
