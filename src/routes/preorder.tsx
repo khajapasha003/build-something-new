@@ -44,11 +44,11 @@ function Preorder() {
           </li>
           <li className="flex gap-3">
             <span className="mt-2 size-1.5 shrink-0 rounded-full bg-primary" />
-            Test credentials are encrypted and deleted 24 hours after a check.
+            Checks run in a real Chromium browser and produce raw evidence (console errors, failing requests, dead links, DOM hygiene).
           </li>
           <li className="flex gap-3">
             <span className="mt-2 size-1.5 shrink-0 rounded-full bg-primary" />
-            Recordings are kept for 30 days by default, then removed.
+            Coming on the roadmap: interactive flow testing, test credentials handling, and visual evidence captures.
           </li>
         </ul>
 

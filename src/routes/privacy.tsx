@@ -34,7 +34,7 @@ const sections = [
   },
   {
     title: "When checks go live",
-    body: "Running a check additionally stores the pages we visited, screenshots, screen recordings and browser traces of the flows we walked through. Test credentials you supply are encrypted at rest and deleted 24 hours after the check finishes. Recordings are kept for 30 days by default.",
+    body: "Running a check stores the page response, browser console errors, failed network requests, and DOM element snippets observed during the check. In future releases with interactive flow testing, test credentials will be encrypted at rest and deleted 24 hours after completion, and any recordings or screenshots will be kept for 30 days by default.",
   },
   {
     title: "Email",

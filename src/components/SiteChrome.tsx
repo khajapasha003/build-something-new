@@ -32,7 +32,7 @@ export function SiteFooter() {
   return (
     <footer className="border-t border-border/60">
       <div className="mx-auto flex max-w-6xl flex-col gap-4 px-6 py-10 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-        <p>PreLaunchQA — test like a real user. Launch with proof.</p>
+        <p>PreLaunchQA — real browser checks before launch. Launch with proof.</p>
         <nav className="flex gap-5">
           <Link to="/terms" className="transition hover:text-foreground">
             Terms

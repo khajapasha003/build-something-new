@@ -30,15 +30,15 @@ const sections = [
   },
   {
     title: "2. What a check covers",
-    body: "Checks are limited to reading pages, walking through user flows in a browser, and observing responses. We do not attempt attacks, we do not fuzz, and we do not attempt to defeat access controls. We use test-mode payments and test accounts only.",
+    body: "Checks are currently limited to loading your homepage in a real browser and observing console errors, network requests, dead links, and document hygiene. We do not attempt attacks, we do not fuzz, and we do not attempt to defeat access controls. Interactive user flow testing (forms, auth, and test checkouts) will only run when explicitly configured in future releases.",
   },
   {
     title: "3. What a check does not mean",
     body: "A report is a record of what we observed at a point in time. It is not a certification, an audit, a guarantee of security, or a statement that your app is free of defects. You remain responsible for your own testing and release decisions.",
   },
   {
-    title: "4. Your credentials and data",
-    body: "Test credentials you provide are stored encrypted and deleted 24 hours after the check completes. Recordings and screenshots are retained for 30 days unless you delete them sooner from your account.",
+    title: "4. Your data and future credentials",
+    body: "Current checks only record raw browser session observations (console logs, failing URLs, and HTML element snippets). When future releases support interactive flow testing with test credentials, credentials will be stored encrypted and deleted 24 hours after completion. Screenshots and recordings will be retained for 30 days unless deleted sooner.",
   },
   {
     title: "5. Payment and refunds",

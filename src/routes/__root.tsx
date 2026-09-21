@@ -80,12 +80,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "PreLaunchQA" },
       {
         name: "description",
-        content: "Runtime testing for AI-built web apps, with video proof for every finding.",
+        content:
+          "Real-browser checks for AI-built web apps: console errors, broken links, accessibility, and raw evidence for every finding.",
       },
       { property: "og:title", content: "PreLaunchQA" },
       {
         property: "og:description",
-        content: "Runtime testing for AI-built web apps, with video proof for every finding.",
+        content:
+          "Real-browser checks for AI-built web apps: console errors, broken links, accessibility, and raw evidence for every finding.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
