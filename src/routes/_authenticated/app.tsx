@@ -297,6 +297,36 @@ function Dashboard() {
                     </div>
                   </div>
 
+                  {scanMessage && scanMessage.appId === app.id ? (
+                    <p className="mt-3 text-xs text-destructive">{scanMessage.text}</p>
+                  ) : null}
+
+                  {appScans.length > 0 ? (
+                    <ul className="mt-4 space-y-2 border-t border-border pt-4">
+                      {appScans.map((scan) => (
+                        <li
+                          key={scan.id}
+                          className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground"
+                        >
+                          <span>
+                            {new Date(scan.created_at).toLocaleString()} ·{" "}
+                            {SCAN_STATUS_LABEL[scan.status]}
+                            {scan.progress_message ? ` — ${scan.progress_message}` : ""}
+                          </span>
+                          <span>
+                            {scan.status === "completed"
+                              ? `${scan.bug_count} bugs · ${scan.needs_review_count} to review · ${scan.passed_count} passed`
+                              : scan.status === "failed" && scan.error
+                                ? scan.error
+                                : isActive(scan)
+                                  ? `${scan.progress}%`
+                                  : ""}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+
                   {isOpen ? (
                     <div className="mt-6 space-y-5 border-t border-border pt-6">
                       <div className="flex flex-wrap gap-2">
