@@ -14,7 +14,12 @@
   - [x] Verification by DNS TXT, meta tag or file — server-side only, SSRF guarded, 10 attempts/app/hour
   - [x] Dashboard: add app, copyable instructions, Mint/Amber/Coral status, Run check disabled (Phase 2)
   - [x] Tests: pass + fail per method, cross-account isolation, localhost & 169.254.169.254 rejected
-- [ ] Phase 2 — scan jobs, findings schema, signed worker API, worker starter repo
+- [x] Phase 2 — scan jobs, findings schema, signed worker API, worker starter repo
+  - [x] `scans`, `findings`, `scan_events` tables, own-rows-only access, one active check per app
+  - [x] Signed worker endpoints: claim / progress / result (HMAC + 5-min window, verified 200 / 401 / 401)
+  - [x] Dashboard: Run check enabled for verified apps, live progress, cancel while queued
+  - [x] `worker/` starter repo: Node 20 + Playwright, checks with evidence, systemd unit, README
+  - [ ] Run the worker on Lightsail and complete one real end-to-end check (needs the server)
 - [ ] Phase 3 — report UI with evidence, re-scan diff
 - [ ] Phase 4 — payments + webhook verification
 - [ ] Phase 5 — support + status page

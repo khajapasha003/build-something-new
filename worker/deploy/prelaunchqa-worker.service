@@ -1,0 +1,18 @@
+[Unit]
+Description=PreLaunchQA scan worker
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/plq-worker/worker
+EnvironmentFile=/opt/plq-worker/worker/.env
+ExecStart=/usr/bin/node src/index.mjs
+Restart=always
+RestartSec=10
+User=ubuntu
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
