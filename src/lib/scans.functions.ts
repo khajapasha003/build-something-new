@@ -100,7 +100,8 @@ export type FindingRow = {
   title: string;
   detail: string | null;
   page_url: string | null;
-  evidence: Record<string, string>;
+  /** Raw evidence from the worker, already formatted as readable JSON. */
+  evidence: string;
   created_at: string;
 };
 
@@ -128,5 +129,14 @@ export const listFindings = createServerFn({ method: "GET" })
       .order("severity", { ascending: true })
       .order("created_at", { ascending: true });
     if (error) throw new Error(error.message);
-    return (rows ?? []) as FindingRow[];
+    return (rows ?? []).map((row) => ({
+      id: row.id,
+      rule_id: row.rule_id,
+      severity: row.severity as FindingRow["severity"],
+      title: row.title,
+      detail: row.detail,
+      page_url: row.page_url,
+      evidence: JSON.stringify(row.evidence ?? {}, null, 2),
+      created_at: row.created_at,
+    }));
   });
