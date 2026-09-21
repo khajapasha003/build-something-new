@@ -55,9 +55,9 @@ const SEVERITY: Record<
   FindingRow["severity"],
   { label: string; dot: string; order: number }
 > = {
-  bug: { label: "Bug", dot: "bg-destructive", order: 0 },
-  needs_review: { label: "Needs review", dot: "bg-warning", order: 1 },
-  passed: { label: "Passed", dot: "bg-success", order: 2 },
+  bug: { label: "Bug", dot: "bg-coral", order: 0 },
+  needs_review: { label: "Needs review", dot: "bg-amber", order: 1 },
+  passed: { label: "Passed", dot: "bg-mint", order: 2 },
 };
 
 function statusLine(scan: ScanRow) {
@@ -125,9 +125,9 @@ function ReportPage() {
         </p>
         {done ? (
           <div className="mt-5 flex flex-wrap gap-3 text-sm">
-            <Count label="bugs" value={scan.bug_count} dot="bg-destructive" />
-            <Count label="to review" value={scan.needs_review_count} dot="bg-warning" />
-            <Count label="passed" value={scan.passed_count} dot="bg-success" />
+            <Count label="bugs" value={scan.bug_count} dot="bg-coral" />
+            <Count label="to review" value={scan.needs_review_count} dot="bg-amber" />
+            <Count label="passed" value={scan.passed_count} dot="bg-mint" />
           </div>
         ) : null}
       </header>
