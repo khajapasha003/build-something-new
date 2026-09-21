@@ -40,7 +40,7 @@ export const Route = createFileRoute("/api/public/worker/progress")({
             status: "running",
             progress: parsed.data.progress,
             progress_message: parsed.data.message,
-            started_at: scan.status === "claimed" ? new Date().toISOString() : undefined,
+            ...(scan.status === "claimed" ? { started_at: new Date().toISOString() } : {}),
           })
           .eq("id", scan.id);
 

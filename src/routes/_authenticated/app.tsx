@@ -14,6 +14,27 @@ import {
   type AppRow,
   type VerificationMethod,
 } from "@/lib/apps.functions";
+import {
+  cancelScan,
+  listScans,
+  requestScan,
+  type ScanRow,
+} from "@/lib/scans.functions";
+
+const ACTIVE_SCAN_STATUSES = ["queued", "claimed", "running"] as const;
+
+function isActive(scan: ScanRow) {
+  return (ACTIVE_SCAN_STATUSES as readonly string[]).includes(scan.status);
+}
+
+const SCAN_STATUS_LABEL: Record<ScanRow["status"], string> = {
+  queued: "Waiting for a worker",
+  claimed: "Picked up by a worker",
+  running: "Running",
+  completed: "Finished",
+  failed: "Failed",
+  cancelled: "Cancelled",
+};
 
 export const Route = createFileRoute("/_authenticated/app")({
   head: () => ({
@@ -89,8 +110,17 @@ function Dashboard() {
   const createApp = useServerFn(addApp);
   const removeApp = useServerFn(deleteApp);
   const runVerify = useServerFn(verifyApp);
+  const fetchScans = useServerFn(listScans);
+  const startScan = useServerFn(requestScan);
+  const stopScan = useServerFn(cancelScan);
 
   const appsQuery = useQuery({ queryKey: ["apps"], queryFn: () => fetchApps() });
+  const scansQuery = useQuery({
+    queryKey: ["scans"],
+    queryFn: () => fetchScans(),
+    refetchInterval: (query) =>
+      (query.state.data ?? []).some(isActive) ? 4000 : false,
+  });
 
   const [url, setUrl] = useState("");
   const [builtWith, setBuiltWith] = useState<(typeof BUILT_WITH)[number]>("Lovable");
@@ -102,8 +132,17 @@ function Dashboard() {
   const [verifyMessage, setVerifyMessage] = useState<{ appId: string; ok: boolean; text: string } | null>(
     null,
   );
+  const [scanMessage, setScanMessage] = useState<{ appId: string; text: string } | null>(null);
 
   const apps = appsQuery.data ?? [];
+  const scans = scansQuery.data ?? [];
+
+  async function onRunCheck(app: AppRow) {
+    setScanMessage(null);
+    const result = await startScan({ data: { appId: app.id } });
+    if (!result.ok) setScanMessage({ appId: app.id, text: result.error });
+    await queryClient.invalidateQueries({ queryKey: ["scans"] });
+  }
 
   async function onAdd(event: React.FormEvent) {
     event.preventDefault();
@@ -199,6 +238,9 @@ function Dashboard() {
             apps.map((app) => {
               const isOpen = openAppId === app.id;
               const token = app.verification_token;
+              const appScans = scans.filter((s) => s.app_id === app.id).slice(0, 5);
+              const activeScan = appScans.find(isActive);
+              const canScan = app.verification_status === "verified";
               return (
                 <article key={app.id} className="rounded-3xl border border-border bg-card p-6">
                   <div className="flex flex-wrap items-center justify-between gap-3">
