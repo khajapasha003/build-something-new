@@ -100,7 +100,7 @@ export type FindingRow = {
   title: string;
   detail: string | null;
   page_url: string | null;
-  evidence: unknown;
+  evidence: Record<string, string>;
   created_at: string;
 };
 
