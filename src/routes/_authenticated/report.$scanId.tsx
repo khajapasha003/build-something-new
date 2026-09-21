@@ -142,6 +142,8 @@ function ReportPage() {
         ) : null}
       </header>
 
+      {done ? <CompareSection comparison={compareQuery.data} loading={compareQuery.isLoading} /> : null}
+
       {!done ? (
         <p className="mt-6 text-sm text-muted-foreground">
           {scan.status === "failed" || scan.status === "cancelled"
