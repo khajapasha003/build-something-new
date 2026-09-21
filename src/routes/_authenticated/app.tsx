@@ -255,14 +255,34 @@ function Dashboard() {
                     </div>
                     <div className="flex items-center gap-2">
                       <StatusBadge status={app.verification_status} />
-                      <button
-                        type="button"
-                        disabled
-                        title="Available in Phase 2"
-                        className="cursor-not-allowed rounded-lg border border-border px-3 py-2 text-xs text-muted-foreground opacity-60"
-                      >
-                        Run check — Available in Phase 2
-                      </button>
+                      {activeScan ? (
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            await stopScan({ data: { scanId: activeScan.id } });
+                            await queryClient.invalidateQueries({ queryKey: ["scans"] });
+                          }}
+                          disabled={activeScan.status !== "queued"}
+                          title={
+                            activeScan.status === "queued"
+                              ? "Cancel this check"
+                              : "A check already running cannot be cancelled"
+                          }
+                          className="rounded-lg border border-border px-3 py-2 text-xs transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          Cancel check
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => void onRunCheck(app)}
+                          disabled={!canScan}
+                          title={canScan ? "Queue a check" : "Verify this app first"}
+                          className="rounded-lg border border-border px-3 py-2 text-xs transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          Run check
+                        </button>
+                      )}
                       <button
                         type="button"
                         onClick={() => {
@@ -276,6 +296,36 @@ function Dashboard() {
                       </button>
                     </div>
                   </div>
+
+                  {scanMessage && scanMessage.appId === app.id ? (
+                    <p className="mt-3 text-xs text-destructive">{scanMessage.text}</p>
+                  ) : null}
+
+                  {appScans.length > 0 ? (
+                    <ul className="mt-4 space-y-2 border-t border-border pt-4">
+                      {appScans.map((scan) => (
+                        <li
+                          key={scan.id}
+                          className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground"
+                        >
+                          <span>
+                            {new Date(scan.created_at).toLocaleString()} ·{" "}
+                            {SCAN_STATUS_LABEL[scan.status]}
+                            {scan.progress_message ? ` — ${scan.progress_message}` : ""}
+                          </span>
+                          <span>
+                            {scan.status === "completed"
+                              ? `${scan.bug_count} bugs · ${scan.needs_review_count} to review · ${scan.passed_count} passed`
+                              : scan.status === "failed" && scan.error
+                                ? scan.error
+                                : isActive(scan)
+                                  ? `${scan.progress}%`
+                                  : ""}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
 
                   {isOpen ? (
                     <div className="mt-6 space-y-5 border-t border-border pt-6">
