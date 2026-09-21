@@ -63,7 +63,7 @@ export const Route = createFileRoute("/api/public/worker/result")({
               title: f.title,
               detail: f.detail ?? null,
               page_url: f.page_url ?? null,
-              evidence: f.evidence ?? {},
+              evidence: (f.evidence ?? {}) as Record<string, never>,
             })),
           );
           if (insertError) {
