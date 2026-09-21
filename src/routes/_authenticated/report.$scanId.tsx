@@ -3,9 +3,12 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 
 import {
+  compareScan,
   getScan,
   listFindings,
+  type ComparisonItem,
   type FindingRow,
+  type ScanComparison,
   type ScanRow,
 } from "@/lib/scans.functions";
 
@@ -77,6 +80,7 @@ function ReportPage() {
   const { scanId } = Route.useParams();
   const fetchScan = useServerFn(getScan);
   const fetchFindings = useServerFn(listFindings);
+  const fetchComparison = useServerFn(compareScan);
 
   const scanQuery = useQuery({
     queryKey: ["scan", scanId],
@@ -93,6 +97,12 @@ function ReportPage() {
   const findingsQuery = useQuery({
     queryKey: ["findings", scanId],
     queryFn: () => fetchFindings({ data: { scanId } }),
+    enabled: Boolean(done),
+  });
+
+  const compareQuery = useQuery({
+    queryKey: ["scan-compare", scanId],
+    queryFn: () => fetchComparison({ data: { scanId } }),
     enabled: Boolean(done),
   });
 
@@ -131,6 +141,8 @@ function ReportPage() {
           </div>
         ) : null}
       </header>
+
+      {done ? <CompareSection comparison={compareQuery.data} loading={compareQuery.isLoading} /> : null}
 
       {!done ? (
         <p className="mt-6 text-sm text-muted-foreground">
@@ -178,6 +190,132 @@ function ReportPage() {
         </ul>
       )}
     </Shell>
+  );
+}
+
+function CompareSection({
+  comparison,
+  loading,
+}: {
+  comparison: ScanComparison | undefined;
+  loading: boolean;
+}) {
+  if (loading) {
+    return (
+      <p className="mt-6 text-sm text-muted-foreground">Comparing with the previous check…</p>
+    );
+  }
+  if (!comparison) return null;
+  if (!comparison.available) {
+    return <p className="mt-6 text-sm text-muted-foreground">{comparison.reason}</p>;
+  }
+
+  const delta = (now: number, before: number) => {
+    const diff = now - before;
+    if (diff === 0) return "no change";
+    return diff > 0 ? `+${diff}` : `${diff}`;
+  };
+
+  return (
+    <section className="mt-6 rounded-3xl border border-border bg-card p-6">
+      <h2 className="font-display text-lg">Since the last check</h2>
+      <p className="mt-1 text-xs text-muted-foreground">
+        Compared with the check finished{" "}
+        {comparison.previousFinishedAt
+          ? new Date(comparison.previousFinishedAt).toLocaleString()
+          : "earlier"}
+        .{" "}
+        <Link
+          to="/report/$scanId"
+          params={{ scanId: comparison.previousScanId }}
+          className="underline underline-offset-2 transition hover:text-foreground"
+        >
+          Open that report
+        </Link>
+      </p>
+
+      <div className="mt-4 flex flex-wrap gap-3 text-sm">
+        <Count
+          label={`bugs (${delta(comparison.currentCounts.bug, comparison.previousCounts.bug)})`}
+          value={comparison.currentCounts.bug}
+          dot="bg-coral"
+        />
+        <Count
+          label={`to review (${delta(
+            comparison.currentCounts.needs_review,
+            comparison.previousCounts.needs_review,
+          )})`}
+          value={comparison.currentCounts.needs_review}
+          dot="bg-amber"
+        />
+        <Count
+          label={`passed (${delta(
+            comparison.currentCounts.passed,
+            comparison.previousCounts.passed,
+          )})`}
+          value={comparison.currentCounts.passed}
+          dot="bg-mint"
+        />
+      </div>
+
+      <div className="mt-5 grid gap-4 md:grid-cols-3">
+        <CompareList title="Fixed" items={comparison.fixed} dot="bg-mint" empty="Nothing fixed." />
+        <CompareList title="New" items={comparison.newIssues} dot="bg-coral" empty="Nothing new." />
+        <CompareList
+          title="Changed"
+          items={comparison.changed}
+          dot="bg-amber"
+          empty="Nothing changed."
+        />
+      </div>
+
+      <p className="mt-4 text-xs text-muted-foreground">
+        {comparison.unchanged} result{comparison.unchanged === 1 ? "" : "s"} stayed the same.
+      </p>
+    </section>
+  );
+}
+
+function CompareList({
+  title,
+  items,
+  dot,
+  empty,
+}: {
+  title: string;
+  items: ComparisonItem[];
+  dot: string;
+  empty: string;
+}) {
+  return (
+    <div className="rounded-2xl border border-border p-4">
+      <div className="flex items-center gap-2">
+        <span className={`inline-block h-2 w-2 rounded-full ${dot}`} aria-hidden />
+        <h3 className="text-xs uppercase tracking-wide text-muted-foreground">
+          {title} ({items.length})
+        </h3>
+      </div>
+      {items.length === 0 ? (
+        <p className="mt-2 text-xs text-muted-foreground">{empty}</p>
+      ) : (
+        <ul className="mt-2 space-y-2">
+          {items.map((item) => (
+            <li key={item.key} className="text-sm">
+              <p>{item.title}</p>
+              <p className="text-xs text-muted-foreground">
+                {item.rule_id}
+                {item.previousSeverity && item.previousSeverity !== item.severity
+                  ? ` · ${SEVERITY[item.previousSeverity].label} → ${SEVERITY[item.severity].label}`
+                  : ""}
+              </p>
+              {item.page_url ? (
+                <p className="truncate text-xs text-muted-foreground">{item.page_url}</p>
+              ) : null}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }
 

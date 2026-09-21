@@ -22,7 +22,7 @@
   - [ ] Run the worker on Lightsail and complete one real end-to-end check (needs the server)
 - [ ] Phase 3 — report UI with evidence, re-scan diff
   - [x] `/report/:id` page: live status, bug/review/passed counts, each finding with its evidence
-  - [ ] Re-scan comparison (needs two completed checks on a real site)
+  - [x] Re-scan comparison on the report (fixed / new / changed vs the previous finished check)
 - [ ] Phase 4 — payments + webhook verification
 - [ ] Phase 5 — support + status page
 
