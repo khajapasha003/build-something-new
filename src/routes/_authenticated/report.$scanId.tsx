@@ -80,6 +80,7 @@ function ReportPage() {
   const { scanId } = Route.useParams();
   const fetchScan = useServerFn(getScan);
   const fetchFindings = useServerFn(listFindings);
+  const fetchComparison = useServerFn(compareScan);
 
   const scanQuery = useQuery({
     queryKey: ["scan", scanId],
