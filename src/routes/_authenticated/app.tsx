@@ -255,14 +255,34 @@ function Dashboard() {
                     </div>
                     <div className="flex items-center gap-2">
                       <StatusBadge status={app.verification_status} />
-                      <button
-                        type="button"
-                        disabled
-                        title="Available in Phase 2"
-                        className="cursor-not-allowed rounded-lg border border-border px-3 py-2 text-xs text-muted-foreground opacity-60"
-                      >
-                        Run check — Available in Phase 2
-                      </button>
+                      {activeScan ? (
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            await stopScan({ data: { scanId: activeScan.id } });
+                            await queryClient.invalidateQueries({ queryKey: ["scans"] });
+                          }}
+                          disabled={activeScan.status !== "queued"}
+                          title={
+                            activeScan.status === "queued"
+                              ? "Cancel this check"
+                              : "A check already running cannot be cancelled"
+                          }
+                          className="rounded-lg border border-border px-3 py-2 text-xs transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          Cancel check
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => void onRunCheck(app)}
+                          disabled={!canScan}
+                          title={canScan ? "Queue a check" : "Verify this app first"}
+                          className="rounded-lg border border-border px-3 py-2 text-xs transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          Run check
+                        </button>
+                      )}
                       <button
                         type="button"
                         onClick={() => {
