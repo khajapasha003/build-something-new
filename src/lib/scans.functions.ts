@@ -100,8 +100,22 @@ export type FindingRow = {
   title: string;
   detail: string | null;
   page_url: string | null;
+  evidence: unknown;
   created_at: string;
 };
+
+export const getScan = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ scanId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }): Promise<ScanRow | null> => {
+    const { data: row, error } = await context.supabase
+      .from("scans")
+      .select(SCAN_COLUMNS)
+      .eq("id", data.scanId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    return (row as ScanRow) ?? null;
+  });
 
 export const listFindings = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -109,7 +123,7 @@ export const listFindings = createServerFn({ method: "GET" })
   .handler(async ({ data, context }): Promise<FindingRow[]> => {
     const { data: rows, error } = await context.supabase
       .from("findings")
-      .select("id, rule_id, severity, title, detail, page_url, created_at")
+      .select("id, rule_id, severity, title, detail, page_url, evidence, created_at")
       .eq("scan_id", data.scanId)
       .order("severity", { ascending: true })
       .order("created_at", { ascending: true });
