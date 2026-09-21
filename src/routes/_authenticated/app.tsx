@@ -238,6 +238,9 @@ function Dashboard() {
             apps.map((app) => {
               const isOpen = openAppId === app.id;
               const token = app.verification_token;
+              const appScans = scans.filter((s) => s.app_id === app.id).slice(0, 5);
+              const activeScan = appScans.find(isActive);
+              const canScan = app.verification_status === "verified";
               return (
                 <article key={app.id} className="rounded-3xl border border-border bg-card p-6">
                   <div className="flex flex-wrap items-center justify-between gap-3">
