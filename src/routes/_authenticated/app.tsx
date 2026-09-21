@@ -14,6 +14,27 @@ import {
   type AppRow,
   type VerificationMethod,
 } from "@/lib/apps.functions";
+import {
+  cancelScan,
+  listScans,
+  requestScan,
+  type ScanRow,
+} from "@/lib/scans.functions";
+
+const ACTIVE_SCAN_STATUSES = ["queued", "claimed", "running"] as const;
+
+function isActive(scan: ScanRow) {
+  return (ACTIVE_SCAN_STATUSES as readonly string[]).includes(scan.status);
+}
+
+const SCAN_STATUS_LABEL: Record<ScanRow["status"], string> = {
+  queued: "Waiting for a worker",
+  claimed: "Picked up by a worker",
+  running: "Running",
+  completed: "Finished",
+  failed: "Failed",
+  cancelled: "Cancelled",
+};
 
 export const Route = createFileRoute("/_authenticated/app")({
   head: () => ({
