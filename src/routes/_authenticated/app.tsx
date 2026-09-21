@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
@@ -313,14 +313,23 @@ function Dashboard() {
                             {SCAN_STATUS_LABEL[scan.status]}
                             {scan.progress_message ? ` — ${scan.progress_message}` : ""}
                           </span>
-                          <span>
-                            {scan.status === "completed"
-                              ? `${scan.bug_count} bugs · ${scan.needs_review_count} to review · ${scan.passed_count} passed`
-                              : scan.status === "failed" && scan.error
-                                ? scan.error
-                                : isActive(scan)
-                                  ? `${scan.progress}%`
-                                  : ""}
+                          <span className="flex items-center gap-3">
+                            <span>
+                              {scan.status === "completed"
+                                ? `${scan.bug_count} bugs · ${scan.needs_review_count} to review · ${scan.passed_count} passed`
+                                : scan.status === "failed" && scan.error
+                                  ? scan.error
+                                  : isActive(scan)
+                                    ? `${scan.progress}%`
+                                    : ""}
+                            </span>
+                            <Link
+                              to="/report/$scanId"
+                              params={{ scanId: scan.id }}
+                              className="rounded-lg border border-border px-2 py-1 transition hover:bg-muted"
+                            >
+                              View report
+                            </Link>
                           </span>
                         </li>
                       ))}

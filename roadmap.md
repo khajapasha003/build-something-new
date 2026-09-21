@@ -21,6 +21,8 @@
   - [x] `worker/` starter repo: Node 20 + Playwright, checks with evidence, systemd unit, README
   - [ ] Run the worker on Lightsail and complete one real end-to-end check (needs the server)
 - [ ] Phase 3 — report UI with evidence, re-scan diff
+  - [x] `/report/:id` page: live status, bug/review/passed counts, each finding with its evidence
+  - [ ] Re-scan comparison (needs two completed checks on a real site)
 - [ ] Phase 4 — payments + webhook verification
 - [ ] Phase 5 — support + status page
 
