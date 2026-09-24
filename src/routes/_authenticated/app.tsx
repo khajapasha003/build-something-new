@@ -14,12 +14,7 @@ import {
   type AppRow,
   type VerificationMethod,
 } from "@/lib/apps.functions";
-import {
-  cancelScan,
-  listScans,
-  requestScan,
-  type ScanRow,
-} from "@/lib/scans.functions";
+import { cancelScan, listScans, requestScan, type ScanRow } from "@/lib/scans.functions";
 
 const ACTIVE_SCAN_STATUSES = ["queued", "claimed", "running"] as const;
 
@@ -118,8 +113,7 @@ function Dashboard() {
   const scansQuery = useQuery({
     queryKey: ["scans"],
     queryFn: () => fetchScans(),
-    refetchInterval: (query) =>
-      (query.state.data ?? []).some(isActive) ? 4000 : false,
+    refetchInterval: (query) => ((query.state.data ?? []).some(isActive) ? 4000 : false),
   });
 
   const [url, setUrl] = useState("");
@@ -129,9 +123,11 @@ function Dashboard() {
   const [openAppId, setOpenAppId] = useState<string | null>(null);
   const [method, setMethod] = useState<VerificationMethod>("meta");
   const [verifying, setVerifying] = useState(false);
-  const [verifyMessage, setVerifyMessage] = useState<{ appId: string; ok: boolean; text: string } | null>(
-    null,
-  );
+  const [verifyMessage, setVerifyMessage] = useState<{
+    appId: string;
+    ok: boolean;
+    text: string;
+  } | null>(null);
   const [scanMessage, setScanMessage] = useState<{ appId: string; text: string } | null>(null);
 
   const apps = appsQuery.data ?? [];
@@ -292,7 +288,11 @@ function Dashboard() {
                         }}
                         className="rounded-lg border border-border px-3 py-2 text-xs transition hover:bg-muted"
                       >
-                        {isOpen ? "Close" : app.verification_status === "verified" ? "Details" : "Verify"}
+                        {isOpen
+                          ? "Close"
+                          : app.verification_status === "verified"
+                            ? "Details"
+                            : "Verify"}
                       </button>
                     </div>
                   </div>
@@ -419,13 +419,7 @@ function Dashboard() {
                       </div>
 
                       {verifyMessage && verifyMessage.appId === app.id ? (
-                        <p
-                          className={`text-sm ${
-                            verifyMessage.ok
-                              ? "text-mint"
-                              : "text-coral"
-                          }`}
-                        >
+                        <p className={`text-sm ${verifyMessage.ok ? "text-mint" : "text-coral"}`}>
                           {verifyMessage.text}
                         </p>
                       ) : null}

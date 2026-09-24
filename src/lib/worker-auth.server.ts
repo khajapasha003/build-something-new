@@ -18,8 +18,7 @@ function safeEqual(a: string, b: string): boolean {
 }
 
 export type VerifiedRequest =
-  | { ok: true; body: unknown }
-  | { ok: false; status: number; error: string };
+  { ok: true; body: unknown } | { ok: false; status: number; error: string };
 
 /**
  * Verifies an incoming worker request:

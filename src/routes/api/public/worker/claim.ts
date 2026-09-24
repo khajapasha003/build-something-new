@@ -9,9 +9,7 @@ export const Route = createFileRoute("/api/public/worker/claim")({
         const verified = await verifyWorkerRequest(request);
         if (!verified.ok) return json({ error: verified.error }, verified.status);
 
-        const parsed = z
-          .object({ worker_id: z.string().min(1).max(100) })
-          .safeParse(verified.body);
+        const parsed = z.object({ worker_id: z.string().min(1).max(100) }).safeParse(verified.body);
         if (!parsed.success) return json({ error: "worker_id is required" }, 400);
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

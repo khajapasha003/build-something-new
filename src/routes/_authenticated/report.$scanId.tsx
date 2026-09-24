@@ -54,10 +54,7 @@ function Shell({ children }: { children: React.ReactNode }) {
   );
 }
 
-const SEVERITY: Record<
-  FindingRow["severity"],
-  { label: string; dot: string; order: number }
-> = {
+const SEVERITY: Record<FindingRow["severity"], { label: string; dot: string; order: number }> = {
   bug: { label: "Bug", dot: "bg-coral", order: 0 },
   needs_review: { label: "Needs review", dot: "bg-amber", order: 1 },
   passed: { label: "Passed", dot: "bg-mint", order: 2 },
@@ -142,7 +139,9 @@ function ReportPage() {
         ) : null}
       </header>
 
-      {done ? <CompareSection comparison={compareQuery.data} loading={compareQuery.isLoading} /> : null}
+      {done ? (
+        <CompareSection comparison={compareQuery.data} loading={compareQuery.isLoading} />
+      ) : null}
 
       {!done ? (
         <p className="mt-6 text-sm text-muted-foreground">
@@ -201,9 +200,7 @@ function CompareSection({
   loading: boolean;
 }) {
   if (loading) {
-    return (
-      <p className="mt-6 text-sm text-muted-foreground">Comparing with the previous check…</p>
-    );
+    return <p className="mt-6 text-sm text-muted-foreground">Comparing with the previous check…</p>;
   }
   if (!comparison) return null;
   if (!comparison.available) {
