@@ -7,17 +7,17 @@ import demoAsset from "@/assets/demo.asset.json";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "PreLaunchQA — test your AI-built app like a real user" },
+      { title: "PreLaunchQA — automated browser checks for your AI-built app" },
       {
         name: "description",
         content:
-          "PreLaunchQA runs your signup, login, form and checkout flows in a real browser before launch, and reports every bug with a screenshot, a video and a fix prompt.",
+          "PreLaunchQA loads your web app in a real Chromium browser and returns console errors, failed network requests, broken links, and accessibility gaps with raw evidence.",
       },
-      { property: "og:title", content: "PreLaunchQA — test like a real user. Launch with proof." },
+      { property: "og:title", content: "PreLaunchQA — real browser checks. Launch with proof." },
       {
         property: "og:description",
         content:
-          "Runtime testing for AI-built web apps: real user flows, real evidence, a fix prompt for every finding.",
+          "Automated browser checks for AI-built web apps: console errors, failed network calls, dead links, and raw evidence for every finding.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -26,14 +26,28 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const included = [
-  "Crawl every internal page: broken links, console errors, failed network calls, 404s and 500s",
-  "Critical flows run in a real browser: signup, login, logout, password reset, your main form, one test-mode checkout",
-  "Responsive check at 1440px and 390px, including horizontal overflow detection",
-  "Passive hygiene on your own site: security headers, HTTPS, mixed content, secret patterns in your public bundle",
-  "Every finding ships with severity, steps, expected vs actual, screenshot, video and a Playwright trace",
-  "A downloadable repro script and a fix prompt per finding",
-  "Re-scan with a before/after diff",
+const currentlyChecked = [
+  "Page HTTP response status (200, 4xx, 5xx, or unreachable)",
+  "Browser console errors logged during page load",
+  "Failed network requests and resource calls",
+  "Page title",
+  "Search description meta tag",
+  "Mobile viewport meta tag",
+  "HTML language attribute (html lang)",
+  "Images without alternative text",
+  "Form fields without labels",
+  "Insecure mixed content (http:// on https://)",
+  "Dead links (empty, '#', or javascript:void)",
+];
+
+const comingNext = [
+  "Multi-page crawling across internal links",
+  "Interactive flows in a real browser: signup, login, logout, password reset, and main forms",
+  "Test-mode checkout walkthroughs and payment form validation",
+  "Visual evidence bundle: screenshots, video recordings, and Playwright traces",
+  "Downloadable reproduction scripts and AI fix prompts per finding",
+  "Responsive dual-breakpoint checks (1440px and 390px) with horizontal overflow detection",
+  "Passive secret pattern scanning in public bundles and security headers inspection",
 ];
 
 const excluded = [
@@ -49,17 +63,17 @@ const steps = [
   {
     step: "01",
     title: "Verify you own the app",
-    body: "Add a DNS record or a meta tag. Nothing is tested until ownership checks out.",
+    body: "Add a DNS record, meta tag, or verification file. Nothing is checked until ownership checks out.",
   },
   {
     step: "02",
-    title: "We walk through it",
-    body: "A real browser signs up, logs in, submits your forms and runs a test-mode checkout, recording as it goes.",
+    title: "We inspect your page",
+    body: "A real Chromium browser loads your homepage and records console errors, failed network calls, dead links, and DOM hygiene.",
   },
   {
     step: "03",
-    title: "You get proof",
-    body: "Each finding carries a screenshot, a video, a trace and a repro script you can run yourself.",
+    title: "You get evidence",
+    body: "Each finding carries raw JSON evidence directly from the browser session, plus an automatic before/after diff when you re-scan.",
   },
 ];
 
@@ -80,10 +94,10 @@ function Index() {
               In development — pre-orders open
             </p>
             <h1 className="mt-6 max-w-4xl text-4xl leading-[1.05] sm:text-6xl">
-              Your AI-built web app, tested like a real user before launch.
+              Your AI-built web app, checked in a real browser before launch.
             </h1>
             <p className="mt-6 max-w-2xl text-lg text-muted-foreground">
-              Every bug comes back with video proof and a fix prompt. No scores, no badges, no
+              Every bug comes back with raw browser evidence. No scores, no badges, no
               claims we cannot show you the evidence for.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
@@ -144,14 +158,25 @@ function Index() {
         </section>
 
         <section className="mx-auto max-w-6xl px-6 pb-20">
-          <h2 className="text-2xl sm:text-3xl">What version one does — and does not do</h2>
-          <div className="mt-8 grid gap-4 lg:grid-cols-2">
+          <h2 className="text-2xl sm:text-3xl">What the check covers — and what is coming next</h2>
+          <div className="mt-8 grid gap-4 lg:grid-cols-3">
             <div className="rounded-2xl border border-mint/30 bg-mint/5 p-6">
-              <h3 className="text-lg text-mint">Included</h3>
+              <h3 className="text-lg text-mint">Currently checked</h3>
               <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
-                {included.map((item) => (
+                {currentlyChecked.map((item) => (
                   <li key={item} className="flex gap-3">
                     <span className="mt-2 size-1.5 shrink-0 rounded-full bg-mint" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="rounded-2xl border border-primary/30 bg-primary/5 p-6">
+              <h3 className="text-lg text-primary">Coming next (Roadmap)</h3>
+              <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
+                {comingNext.map((item) => (
+                  <li key={item} className="flex gap-3">
+                    <span className="mt-2 size-1.5 shrink-0 rounded-full bg-primary" />
                     <span>{item}</span>
                   </li>
                 ))}
@@ -194,15 +219,15 @@ function Index() {
               {
                 name: "Sample scan",
                 price: "Free",
-                body: "Five pages, no login flows. Shows you the report format on your own site.",
+                body: "Single-page check. Shows you the report format and raw browser evidence on your homepage.",
               },
               {
-                name: "Launch check",
+                name: "Launch check (Coming next)",
                 price: "One-time",
-                body: "Full crawl, critical flows, responsive pass, full evidence bundle, one re-scan.",
+                body: "Pre-order: Multi-page crawl, interactive critical flows, responsive pass, full evidence bundle, one re-scan.",
               },
               {
-                name: "Re-test plan",
+                name: "Re-test plan (Coming next)",
                 price: "Monthly",
                 body: "Scheduled re-runs with a before/after diff after each deploy cycle.",
               },
