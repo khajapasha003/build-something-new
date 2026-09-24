@@ -44,11 +44,13 @@ function Preorder() {
           </li>
           <li className="flex gap-3">
             <span className="mt-2 size-1.5 shrink-0 rounded-full bg-primary" />
-            Checks run in a real Chromium browser and produce raw evidence (console errors, failing requests, dead links, DOM hygiene).
+            Checks run in a real Chromium browser and produce raw evidence (console errors, failing
+            requests, dead links, DOM hygiene).
           </li>
           <li className="flex gap-3">
             <span className="mt-2 size-1.5 shrink-0 rounded-full bg-primary" />
-            Coming on the roadmap: interactive flow testing, test credentials handling, and visual evidence captures.
+            Coming on the roadmap: interactive flow testing, test credentials handling, and visual
+            evidence captures.
           </li>
         </ul>
 

@@ -43,9 +43,7 @@ async function post(path, payload) {
   }
 
   if (!response.ok) {
-    throw new Error(
-      `${path} responded ${response.status}: ${parsed?.error ?? text.slice(0, 200)}`,
-    );
+    throw new Error(`${path} responded ${response.status}: ${parsed?.error ?? text.slice(0, 200)}`);
   }
   return parsed;
 }

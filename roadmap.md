@@ -27,6 +27,7 @@
 - [ ] Phase 5 — support + status page
 
 ## Blocked / needs user
+
 - Payment provider account approval (Dodo or Stripe)
 - Legal text for Terms / Privacy (lawyer review)
 - Lightsail worker server sizing + SSH access (needed at Phase 2)

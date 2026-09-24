@@ -13,15 +13,15 @@ PreLaunchQA tests AI-built web apps like a real user before launch — it walks 
 
 ## Folder structure
 
-| Path | Purpose |
-| --- | --- |
-| `src/routes/` | File-based routes. Public pages at top level; signed-in pages under `_authenticated/` |
-| `src/lib/` | Server functions (`*.functions.ts`) and server-only logic (`*.server.ts`) |
-| `src/components/` | Shared UI (site header/footer, signup form, shadcn primitives) |
-| `src/integrations/supabase/` | Generated Supabase clients and auth middleware — do not edit |
-| `src/assets/` | CDN-backed media pointers (`*.asset.json`) |
-| `supabase/migrations/` | Database migrations (see below) |
-| `supabase/config.toml` | Generated Lovable Cloud config — do not edit |
+| Path                         | Purpose                                                                               |
+| ---------------------------- | ------------------------------------------------------------------------------------- |
+| `src/routes/`                | File-based routes. Public pages at top level; signed-in pages under `_authenticated/` |
+| `src/lib/`                   | Server functions (`*.functions.ts`) and server-only logic (`*.server.ts`)             |
+| `src/components/`            | Shared UI (site header/footer, signup form, shadcn primitives)                        |
+| `src/integrations/supabase/` | Generated Supabase clients and auth middleware — do not edit                          |
+| `src/assets/`                | CDN-backed media pointers (`*.asset.json`)                                            |
+| `supabase/migrations/`       | Database migrations (see below)                                                       |
+| `supabase/config.toml`       | Generated Lovable Cloud config — do not edit                                          |
 
 ## Database migrations
 

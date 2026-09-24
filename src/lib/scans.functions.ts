@@ -3,13 +3,7 @@ import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-export type ScanStatus =
-  | "queued"
-  | "claimed"
-  | "running"
-  | "completed"
-  | "failed"
-  | "cancelled";
+export type ScanStatus = "queued" | "claimed" | "running" | "completed" | "failed" | "cancelled";
 
 export type ScanRow = {
   id: string;
@@ -187,7 +181,8 @@ export const compareScan = createServerFn({ method: "GET" })
     if (!previous) {
       return {
         available: false,
-        reason: "This is the first finished check for this app, so there is nothing to compare yet.",
+        reason:
+          "This is the first finished check for this app, so there is nothing to compare yet.",
       };
     }
 

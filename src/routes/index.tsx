@@ -54,7 +54,7 @@ const excluded = [
   "Native mobile apps and desktop apps",
   "Active attacks: SQL injection, brute force, fuzzing, denial of service",
   "Real payments or changes to your production data — test mode and test accounts only",
-  "\"Certified\", \"secure\" or \"bug-free\" badges. We report evidence, not guarantees",
+  '"Certified", "secure" or "bug-free" badges. We report evidence, not guarantees',
   "Auto-fixing your code or pushing to your repository",
   "Scanning any site without verified owner permission",
 ];
@@ -97,8 +97,8 @@ function Index() {
               Your AI-built web app, checked in a real browser before launch.
             </h1>
             <p className="mt-6 max-w-2xl text-lg text-muted-foreground">
-              Every bug comes back with raw browser evidence. No scores, no badges, no
-              claims we cannot show you the evidence for.
+              Every bug comes back with raw browser evidence. No scores, no badges, no claims we
+              cannot show you the evidence for.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link

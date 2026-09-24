@@ -47,9 +47,7 @@ export const Route = createFileRoute("/api/public/worker/result")({
         // Truth rule: a finding with no evidence is dropped, never displayed.
         const findings =
           parsed.data.status === "completed"
-            ? parsed.data.findings.filter(
-                (f) => f.evidence && Object.keys(f.evidence).length > 0,
-              )
+            ? parsed.data.findings.filter((f) => f.evidence && Object.keys(f.evidence).length > 0)
             : [];
 
         if (findings.length > 0) {
@@ -72,8 +70,7 @@ export const Route = createFileRoute("/api/public/worker/result")({
           }
         }
 
-        const count = (severity: string) =>
-          findings.filter((f) => f.severity === severity).length;
+        const count = (severity: string) => findings.filter((f) => f.severity === severity).length;
 
         await supabaseAdmin
           .from("scans")

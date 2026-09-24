@@ -60,7 +60,8 @@ function isBlockedHostname(host: string): boolean {
 export function isBlockedIp(ip: string): boolean {
   if (ip.includes(":")) return isBlockedIpv6(ip);
   const parts = ip.split(".").map((p) => Number(p));
-  if (parts.length !== 4 || parts.some((n) => !Number.isInteger(n) || n < 0 || n > 255)) return true;
+  if (parts.length !== 4 || parts.some((n) => !Number.isInteger(n) || n < 0 || n > 255))
+    return true;
   const [a, b] = parts as [number, number, number, number];
   if (a === 0 || a === 10 || a === 127) return true;
   if (a === 100 && b >= 64 && b <= 127) return true; // CGNAT
@@ -89,10 +90,10 @@ async function dohQuery(name: string, type: "A" | "AAAA" | "TXT"): Promise<DohAn
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
   try {
-    const res = await fetch(
-      `${DOH_ENDPOINT}?name=${encodeURIComponent(name)}&type=${type}`,
-      { headers: { accept: "application/dns-json" }, signal: controller.signal },
-    );
+    const res = await fetch(`${DOH_ENDPOINT}?name=${encodeURIComponent(name)}&type=${type}`, {
+      headers: { accept: "application/dns-json" },
+      signal: controller.signal,
+    });
     if (!res.ok) return [];
     const body = (await res.json()) as { Answer?: DohAnswer[] };
     return body.Answer ?? [];
@@ -104,7 +105,9 @@ async function dohQuery(name: string, type: "A" | "AAAA" | "TXT"): Promise<DohAn
 }
 
 /** Resolves a host and fails closed if it does not resolve or any address is private. */
-export async function assertPublicHost(host: string): Promise<{ ok: true } | { ok: false; reason: string }> {
+export async function assertPublicHost(
+  host: string,
+): Promise<{ ok: true } | { ok: false; reason: string }> {
   if (isBlockedHostname(host)) return { ok: false, reason: `Blocked hostname: ${host}` };
   const literal = host.replace(/^\[|\]$/g, "");
   if (/^\d{1,3}(\.\d{1,3}){3}$/.test(literal) || literal.includes(":")) {
@@ -118,16 +121,19 @@ export async function assertPublicHost(host: string): Promise<{ ok: true } | { o
     .map((ans) => ans.data.trim());
   if (ips.length === 0) return { ok: false, reason: `DNS did not resolve ${host}` };
   const blocked = ips.find((ip) => isBlockedIp(ip));
-  if (blocked) return { ok: false, reason: `${host} resolves to a non-public address (${blocked})` };
+  if (blocked)
+    return { ok: false, reason: `${host} resolves to a non-public address (${blocked})` };
   return { ok: true };
 }
 
 export type SafeFetchResult =
-  | { ok: true; body: string; finalUrl: string }
-  | { ok: false; reason: string };
+  { ok: true; body: string; finalUrl: string } | { ok: false; reason: string };
 
 /** https-only fetch: DNS-checked every hop, max 3 redirects, same registered origin, 5s, 1 MB. */
-export async function safeFetch(startUrl: string, registeredOrigin: string): Promise<SafeFetchResult> {
+export async function safeFetch(
+  startUrl: string,
+  registeredOrigin: string,
+): Promise<SafeFetchResult> {
   let current = startUrl;
   for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
     let url: URL;
@@ -136,8 +142,10 @@ export async function safeFetch(startUrl: string, registeredOrigin: string): Pro
     } catch {
       return { ok: false, reason: `Invalid URL: ${current}` };
     }
-    if (url.protocol !== "https:") return { ok: false, reason: `Non-https URL rejected: ${url.protocol}//` };
-    if (url.port && url.port !== "443") return { ok: false, reason: "Custom ports are not allowed" };
+    if (url.protocol !== "https:")
+      return { ok: false, reason: `Non-https URL rejected: ${url.protocol}//` };
+    if (url.port && url.port !== "443")
+      return { ok: false, reason: "Custom ports are not allowed" };
 
     const dns = await assertPublicHost(url.hostname);
     if (!dns.ok) return { ok: false, reason: dns.reason };
@@ -159,7 +167,8 @@ export async function safeFetch(startUrl: string, registeredOrigin: string): Pro
 
     if (res.status >= 300 && res.status < 400) {
       const location = res.headers.get("location");
-      if (!location) return { ok: false, reason: `Redirect ${res.status} without a location header` };
+      if (!location)
+        return { ok: false, reason: `Redirect ${res.status} without a location header` };
       if (hop === MAX_REDIRECTS) return { ok: false, reason: "Too many redirects (max 3)" };
       current = new URL(location, url).toString();
       continue;

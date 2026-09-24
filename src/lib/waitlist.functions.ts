@@ -18,9 +18,7 @@ const signupSchema = z.object({
 
 export type SignupInput = z.infer<typeof signupSchema>;
 
-export type SignupResult =
-  | { ok: true }
-  | { ok: false; error: string };
+export type SignupResult = { ok: true } | { ok: false; error: string };
 
 const RATE_LIMIT_PER_HOUR = 5;
 

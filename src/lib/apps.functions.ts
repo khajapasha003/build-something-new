@@ -153,7 +153,8 @@ export const verifyApp = createServerFn({ method: "POST" })
       return {
         ok: false,
         status: app.verification_status as VerifyResult["status"],
-        reason: "DNS verification is not available on this hosting provider. Use the meta tag or file method.",
+        reason:
+          "DNS verification is not available on this hosting provider. Use the meta tag or file method.",
       };
     }
 

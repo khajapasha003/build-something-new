@@ -75,8 +75,7 @@ export async function runChecks(page, response, { targetUrl, consoleErrors, fail
   // 4. Page title and description.
   const meta = await page.evaluate(() => ({
     title: document.title || "",
-    description:
-      document.querySelector('meta[name="description"]')?.getAttribute("content") || "",
+    description: document.querySelector('meta[name="description"]')?.getAttribute("content") || "",
     viewport: document.querySelector('meta[name="viewport"]')?.getAttribute("content") || "",
     lang: document.documentElement.getAttribute("lang") || "",
   }));

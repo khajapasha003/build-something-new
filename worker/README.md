@@ -8,11 +8,11 @@ in a real Chromium browser, and sends back findings with evidence.
 
 Three signed endpoints on the app:
 
-| Endpoint | Purpose |
-| --- | --- |
-| `POST /api/public/worker/claim` | Take the oldest queued check |
+| Endpoint                           | Purpose                              |
+| ---------------------------------- | ------------------------------------ |
+| `POST /api/public/worker/claim`    | Take the oldest queued check         |
 | `POST /api/public/worker/progress` | Report progress (0-99) while working |
-| `POST /api/public/worker/result` | Send findings and finish the check |
+| `POST /api/public/worker/result`   | Send findings and finish the check   |
 
 Every request carries `x-plq-timestamp` (unix seconds) and `x-plq-signature`
 = HMAC-SHA256 of `"<timestamp>.<raw json body>"` using `WORKER_SHARED_SECRET`.
