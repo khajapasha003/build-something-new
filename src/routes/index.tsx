@@ -27,14 +27,17 @@ export const Route = createFileRoute("/")({
 });
 
 const currentlyChecked = [
-  "HTTP status: verifies the page responds with 200 and detects 4xx, 5xx, or unreachability",
-  "Browser console errors: captures any JavaScript exceptions logged during page load",
-  "Failed network requests: catches broken assets, failing API calls, and 404/500 responses",
-  "SEO & document tags: verifies page title, search description, mobile viewport tag, and language",
-  "Accessibility basics: identifies images without alt text and unlabelled form fields",
-  "Security hygiene: catches insecure mixed content (http:// resources loaded on https://)",
-  "Dead links: flags anchors with empty targets, '#', or javascript:void",
-  "Re-scan diff: compares every result against your previous finished check to show fixed, new, and changed findings",
+  "Page HTTP response status (200, 4xx, 5xx, or unreachable)",
+  "Browser console errors logged during page load",
+  "Failed network requests and resource calls",
+  "Page title",
+  "Search description meta tag",
+  "Mobile viewport meta tag",
+  "HTML language attribute (html lang)",
+  "Images without alternative text",
+  "Form fields without labels",
+  "Insecure mixed content (http:// on https://)",
+  "Dead links (empty, '#', or javascript:void)",
 ];
 
 const comingNext = [
@@ -155,10 +158,10 @@ function Index() {
         </section>
 
         <section className="mx-auto max-w-6xl px-6 pb-20">
-          <h2 className="text-2xl sm:text-3xl">What version one does — and what is coming next</h2>
+          <h2 className="text-2xl sm:text-3xl">What the check covers — and what is coming next</h2>
           <div className="mt-8 grid gap-4 lg:grid-cols-3">
             <div className="rounded-2xl border border-mint/30 bg-mint/5 p-6">
-              <h3 className="text-lg text-mint">Currently checked (Version 1)</h3>
+              <h3 className="text-lg text-mint">Currently checked</h3>
               <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
                 {currentlyChecked.map((item) => (
                   <li key={item} className="flex gap-3">
