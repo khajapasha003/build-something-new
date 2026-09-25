@@ -40,6 +40,27 @@ export function createServer4101() {
       return;
     }
 
+    if (url.pathname === "/with-evil") {
+      res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+      res.end(`<!DOCTYPE html>
+<html>
+<head>
+  <link rel="icon" href="data:,">
+  <script src="http://evil.test:4101/plqa-evil.js"></script>
+</head>
+<body>
+  <h1>Fixture With Evil Subresource</h1>
+</body>
+</html>`);
+      return;
+    }
+
+    if (url.pathname === "/plqa-evil.js") {
+      res.writeHead(200, { "Content-Type": "application/javascript" });
+      res.end("console.log('evil loaded');");
+      return;
+    }
+
     if (url.pathname === "/status-500") {
       res.writeHead(500, { "Content-Type": "text/html; charset=utf-8" });
       res.end(`<!DOCTYPE html>

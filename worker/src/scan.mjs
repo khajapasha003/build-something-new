@@ -4,7 +4,7 @@ import crypto from "node:crypto";
 import dns from "node:dns/promises";
 import net from "node:net";
 import { runChecks } from "./checks.mjs";
-import { isPrivateIp, checkTargetSafety } from "./security.mjs";
+import { isPrivateIp, checkTargetSafety, extractAddresses } from "./security.mjs";
 
 export const NAV_TIMEOUT_MS = 30_000;
 
@@ -19,6 +19,7 @@ export const NAV_TIMEOUT_MS = 30_000;
  * @param {string} [options.screenshotPath]
  * @param {boolean} [options.isDaemon=false]
  * @param {boolean} [options.blockPrivate=isDaemon]
+ * @param {Function} [options.lookup]
  * @param {function} [options.onProgress]
  * @returns {Promise<{ findings: Array<object>, finalUrl: string, screenshot: { file: string, sha256: string } | null, screenshotError: string | null, aborted?: boolean, abortReason?: string }>}
  */
@@ -31,6 +32,7 @@ export async function executeScan(
     screenshotPath = null,
     isDaemon = false,
     blockPrivate = isDaemon,
+    lookup = (h, opts) => dns.lookup(h, opts),
     onProgress = async () => {},
   },
 ) {
@@ -62,7 +64,7 @@ export async function executeScan(
   }
 
   if (blockPrivate) {
-    const safety = await checkTargetSafety(targetUrl, origin);
+    const safety = await checkTargetSafety(targetUrl, origin, { lookup });
     if (!safety.safe) {
       return {
         aborted: true,
@@ -91,30 +93,63 @@ export async function executeScan(
     const hostCache = new Map();
     await page.route("**/*", async (route) => {
       try {
-        const u = new URL(route.request().url());
-        const host = u.hostname;
+        const reqUrl = route.request().url();
+        let parsed;
+        try {
+          parsed = new URL(reqUrl);
+        } catch {
+          await route.abort("blockedbyclient");
+          return;
+        }
+
+        // Requests whose protocol is not http: or https: continue without checks (e.g. data:, blob:)
+        if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+          await route.continue();
+          return;
+        }
+
+        let host = parsed.hostname;
+        if (host.startsWith("[") && host.endsWith("]")) {
+          host = host.slice(1, -1);
+        }
+
         if (hostCache.has(host)) {
           if (hostCache.get(host)) {
             await route.abort("blockedbyclient");
             return;
           }
+          await route.continue();
+          return;
+        }
+
+        let blocked = false;
+        if (net.isIP(host) !== 0) {
+          blocked = isPrivateIp(host);
         } else {
-          let blocked = isPrivateIp(host);
-          if (!blocked && !net.isIP(host)) {
-            const addrs = await dns.lookup(host, { all: true }).catch(() => []);
-            blocked = addrs.some((a) => isPrivateIp(a.address));
-          }
-          hostCache.set(host, blocked);
-          if (blocked) {
-            await route.abort("blockedbyclient");
-            return;
+          try {
+            const res = await lookup(host, { all: true });
+            const addrs = extractAddresses(res);
+            if (addrs.length === 0) {
+              blocked = true;
+            } else {
+              blocked = addrs.some((a) => net.isIP(a) === 0 || isPrivateIp(a));
+            }
+          } catch {
+            // Resolver error means unsafe (fail closed)
+            blocked = true;
           }
         }
+
+        hostCache.set(host, blocked);
+        if (blocked) {
+          await route.abort("blockedbyclient");
+          return;
+        }
+
+        await route.continue();
       } catch {
         await route.abort("blockedbyclient");
-        return;
       }
-      await route.continue();
     });
   }
 
