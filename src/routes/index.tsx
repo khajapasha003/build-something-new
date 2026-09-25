@@ -2,7 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { SignupForm } from "@/components/SignupForm";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
-import demoAsset from "@/assets/demo.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -20,7 +19,6 @@ export const Route = createFileRoute("/")({
           "Automated browser checks for AI-built web apps: console errors, failed network calls, dead links, and raw evidence for every finding.",
       },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Index,
@@ -132,7 +130,7 @@ function Index() {
         <section id="demo" className="mx-auto max-w-5xl px-6 pb-20">
           <div className="overflow-hidden rounded-3xl border border-border bg-card">
             <video
-              src={demoAsset.url}
+              src="/media/prelaunchqa-demo.mp4"
               controls
               playsInline
               preload="metadata"

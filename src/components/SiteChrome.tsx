@@ -1,13 +1,13 @@
 import { Link } from "@tanstack/react-router";
 
-import logoAsset from "@/assets/logo.asset.json";
+import { BrandLogo } from "@/components/BrandLogo";
 
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-4">
         <Link to="/" className="flex items-center">
-          <img src={logoAsset.url} alt="PreLaunchQA" className="h-8 w-auto" />
+          <BrandLogo className="h-8 w-auto" />
         </Link>
         <nav className="flex items-center gap-5 text-sm text-muted-foreground">
           <Link to="/preorder" className="transition hover:text-foreground">
