@@ -3,6 +3,8 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 
+import { BrandLogo } from "@/components/BrandLogo";
+
 import {
   adminListFindings,
   adminListScans,
@@ -95,6 +97,7 @@ function AdminPage() {
   return (
     <Shell>
       <header className="flex flex-wrap items-end justify-between gap-4">
+        <BrandLogo className="h-8 w-auto" />
         <div>
           <h1 className="font-display text-2xl">Review console</h1>
           <p className="mt-1 text-sm text-muted-foreground">

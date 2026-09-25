@@ -90,7 +90,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "Real-browser checks for AI-built web apps: console errors, broken links, accessibility, and raw evidence for every finding.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:image", content: "https://prelaunchqa.com/brand/og-image.png" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: "https://prelaunchqa.com/brand/og-image.png" },
     ],
     links: [
       {
@@ -104,6 +108,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Manrope:wght@400;500;600&display=swap",
       },
       { rel: "icon", href: "/favicon.png", type: "image/png" },
+      { rel: "apple-touch-icon", href: "/brand/apple-touch-icon.png" },
     ],
   }),
   shellComponent: RootShell,

@@ -2,6 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 
+import { BrandLogo } from "@/components/BrandLogo";
+
 import {
   compareScan,
   getScan,
@@ -126,6 +128,7 @@ function ReportPage() {
   return (
     <Shell>
       <header className="rounded-3xl border border-border bg-card p-6">
+        <BrandLogo className="h-8 w-auto" />
         <h1 className="font-display text-2xl">{scan.target_url}</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Started {new Date(scan.created_at).toLocaleString()} · {statusLine(scan)}
