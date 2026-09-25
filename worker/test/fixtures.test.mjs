@@ -8,6 +8,7 @@ import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
 import { startServers } from "../../fixtures/serve.mjs";
 import { executeScan } from "../src/scan.mjs";
+import { isPrivateIp } from "../src/security.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -311,6 +312,7 @@ describe("Phase A: Known-Answer Fixture Harness & Evidence Contract", () => {
         targetUrl: "http://127.0.0.1:4101/",
         takeScreenshot: false,
         isDaemon: true,
+        blockPrivate: false,
       });
 
       assert.equal(result.screenshot, null, "screenshot must be null in daemon mode");
@@ -350,6 +352,89 @@ describe("Phase A: Known-Answer Fixture Harness & Evidence Contract", () => {
       assert.ok(byteCount < 900000, `Payload ${byteCount} bytes must be under 900,000 bytes`);
     } finally {
       await browser.close().catch(() => {});
+    }
+  });
+
+  test("Gate F2: Daemon-mode scan of http://127.0.0.1:4101/ aborts with private-address reason, 0 requests", async () => {
+    let requestCount = 0;
+    const countReq = () => {
+      requestCount++;
+    };
+    servers.server4101.on("request", countReq);
+
+    const browser = await chromium.launch({ args: ["--no-sandbox"] });
+    try {
+      const result = await executeScan(browser, {
+        targetUrl: "http://127.0.0.1:4101/",
+        origin: "http://127.0.0.1:4101",
+        isDaemon: true,
+        blockPrivate: true,
+      });
+
+      assert.equal(result.aborted, true, "Scan must be aborted");
+      assert.match(
+        result.abortReason || "",
+        /private|restricted/i,
+        "Abort reason must mention private address",
+      );
+      assert.equal(requestCount, 0, "Fixture server must receive 0 requests");
+    } finally {
+      servers.server4101.off("request", countReq);
+      await browser.close().catch(() => {});
+    }
+  });
+
+  test("Gate F3: Daemon-mode scan where target origin differs from claimed origin aborts before navigation, 0 requests", async () => {
+    let requestCount = 0;
+    const countReq = () => {
+      requestCount++;
+    };
+    servers.server4101.on("request", countReq);
+
+    const browser = await chromium.launch({ args: ["--no-sandbox"] });
+    try {
+      const result = await executeScan(browser, {
+        targetUrl: "http://127.0.0.1:4101/",
+        origin: "https://different-claimed-origin.example.com",
+        isDaemon: true,
+        blockPrivate: false,
+      });
+
+      assert.equal(result.aborted, true, "Scan must be aborted");
+      assert.match(
+        result.abortReason || "",
+        /origin|verified site/i,
+        "Abort reason must mention origin mismatch",
+      );
+      assert.equal(requestCount, 0, "Fixture server must receive 0 requests");
+    } finally {
+      servers.server4101.off("request", countReq);
+      await browser.close().catch(() => {});
+    }
+  });
+
+  test("Gate F8: Private-address helper known-answer unit test", () => {
+    const privateIps = [
+      "127.0.0.1",
+      "10.0.0.1",
+      "172.16.0.1",
+      "192.168.1.1",
+      "169.254.169.254",
+      "100.64.0.1",
+      "0.0.0.0",
+      "::1",
+      "fe80::1",
+      "fc00::1",
+      "::ffff:127.0.0.1",
+      "224.0.0.1",
+    ];
+    const publicIps = ["8.8.8.8", "1.1.1.1", "2606:4700:4700::1111"];
+
+    for (const ip of privateIps) {
+      assert.equal(isPrivateIp(ip), true, `Expected ${ip} to be recognized as private`);
+    }
+    for (const ip of publicIps) {
+      assert.equal(isPrivateIp(ip), false, `Expected ${ip} to be recognized as public`);
     }
   });
 });
