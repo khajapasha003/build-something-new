@@ -90,7 +90,7 @@ export const Route = createFileRoute("/api/public/worker/claim")({
             job: {
               scan_id: claimed.id,
               claim_token: claimToken,
-              target_url: claimed.target_url,
+              target_url: `${app.origin}/`,
               origin: app.origin,
               built_with: app.built_with,
             },

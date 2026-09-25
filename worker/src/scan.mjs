@@ -1,7 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
+import dns from "node:dns/promises";
+import net from "node:net";
 import { runChecks } from "./checks.mjs";
+import { isPrivateIp, checkTargetSafety, extractAddresses } from "./security.mjs";
 
 export const NAV_TIMEOUT_MS = 30_000;
 
@@ -15,6 +18,8 @@ export const NAV_TIMEOUT_MS = 30_000;
  * @param {boolean} [options.takeScreenshot=false]
  * @param {string} [options.screenshotPath]
  * @param {boolean} [options.isDaemon=false]
+ * @param {boolean} [options.blockPrivate=isDaemon]
+ * @param {Function} [options.lookup]
  * @param {function} [options.onProgress]
  * @returns {Promise<{ findings: Array<object>, finalUrl: string, screenshot: { file: string, sha256: string } | null, screenshotError: string | null, aborted?: boolean, abortReason?: string }>}
  */
@@ -26,9 +31,52 @@ export async function executeScan(
     takeScreenshot = false,
     screenshotPath = null,
     isDaemon = false,
+    blockPrivate = isDaemon,
+    lookup = (h, opts) => dns.lookup(h, opts),
     onProgress = async () => {},
   },
 ) {
+  // Pre-navigation safety checks
+  if (origin) {
+    try {
+      const targetOrigin = new URL(targetUrl).origin;
+      const claimedOrigin = new URL(origin).origin;
+      if (targetOrigin !== claimedOrigin) {
+        return {
+          aborted: true,
+          abortReason: `Target origin ${targetOrigin} does not match verified site ${claimedOrigin}`,
+          findings: [],
+          finalUrl: targetUrl,
+          screenshot: null,
+          screenshotError: null,
+        };
+      }
+    } catch (err) {
+      return {
+        aborted: true,
+        abortReason: `Invalid URL: ${err.message}`,
+        findings: [],
+        finalUrl: targetUrl,
+        screenshot: null,
+        screenshotError: null,
+      };
+    }
+  }
+
+  if (blockPrivate) {
+    const safety = await checkTargetSafety(targetUrl, origin, { lookup });
+    if (!safety.safe) {
+      return {
+        aborted: true,
+        abortReason: safety.reason,
+        findings: [],
+        finalUrl: targetUrl,
+        screenshot: null,
+        screenshotError: null,
+      };
+    }
+  }
+
   const consoleErrors = [];
   const failedRequests = [];
 
@@ -39,6 +87,71 @@ export async function executeScan(
   });
   const page = await context.newPage();
   page.setDefaultTimeout(NAV_TIMEOUT_MS);
+
+  // Request interception to block private addresses during page load
+  if (blockPrivate) {
+    const hostCache = new Map();
+    await page.route("**/*", async (route) => {
+      try {
+        const reqUrl = route.request().url();
+        let parsed;
+        try {
+          parsed = new URL(reqUrl);
+        } catch {
+          await route.abort("blockedbyclient");
+          return;
+        }
+
+        // Requests whose protocol is not http: or https: continue without checks (e.g. data:, blob:)
+        if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+          await route.continue();
+          return;
+        }
+
+        let host = parsed.hostname;
+        if (host.startsWith("[") && host.endsWith("]")) {
+          host = host.slice(1, -1);
+        }
+
+        if (hostCache.has(host)) {
+          if (hostCache.get(host)) {
+            await route.abort("blockedbyclient");
+            return;
+          }
+          await route.continue();
+          return;
+        }
+
+        let blocked = false;
+        if (net.isIP(host) !== 0) {
+          blocked = isPrivateIp(host);
+        } else {
+          try {
+            const res = await lookup(host, { all: true });
+            const addrs = extractAddresses(res);
+            if (addrs.length === 0) {
+              blocked = true;
+            } else {
+              blocked = addrs.some((a) => net.isIP(a) === 0 || isPrivateIp(a));
+            }
+          } catch {
+            // Resolver error means unsafe (fail closed)
+            blocked = true;
+          }
+        }
+
+        hostCache.set(host, blocked);
+        if (blocked) {
+          await route.abort("blockedbyclient");
+          return;
+        }
+
+        await route.continue();
+      } catch {
+        await route.abort("blockedbyclient");
+      }
+    });
+  }
 
   // Exact 3 listeners required by Gate G12
   page.on("console", (msg) => {

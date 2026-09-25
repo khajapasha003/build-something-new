@@ -186,10 +186,11 @@ export const verifyApp = createServerFn({ method: "POST" })
 
     if (outcome.verified) {
       // Same origin may be verified by only one account at a time.
-      const { error: updateError } = await context.supabase
+      const { error: updateError } = await supabaseAdmin
         .from("apps")
         .update({ verification_status: "verified", verified_at: new Date().toISOString() })
-        .eq("id", app.id);
+        .eq("id", app.id)
+        .eq("user_id", context.userId);
       if (updateError) {
         if (updateError.code === "23505") {
           outcome = {
@@ -203,10 +204,11 @@ export const verifyApp = createServerFn({ method: "POST" })
     }
 
     if (!outcome.verified && app.verification_status !== "verified") {
-      await context.supabase
+      await supabaseAdmin
         .from("apps")
         .update({ verification_status: "failed" })
-        .eq("id", app.id);
+        .eq("id", app.id)
+        .eq("user_id", context.userId);
     }
 
     await supabaseAdmin.from("verification_attempts").insert({
