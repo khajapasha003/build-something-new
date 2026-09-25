@@ -9,6 +9,7 @@
   "scripts": {
     "start": "node src/index.mjs",
     "once": "RUN_ONCE=1 node src/index.mjs",
+    "test:fixtures": "node --test test/fixtures.test.mjs",
     "postinstall": "playwright install --with-deps chromium"
   },
   "dependencies": {
