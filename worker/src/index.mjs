@@ -17,6 +17,7 @@ async function scan(job) {
       targetUrl,
       origin,
       takeScreenshot: false,
+      isDaemon: true,
       onProgress: async (progress, message) => {
         await api.progress(scanId, token, progress, message);
       },

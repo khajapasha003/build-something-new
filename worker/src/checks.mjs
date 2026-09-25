@@ -19,19 +19,22 @@ export async function runChecks(
     consoleErrors = [],
     failedRequests = [],
     screenshot = null,
+    screenshotError = null,
+    loadError = null,
+    isDaemon = false,
     observedAt = new Date().toISOString(),
   } = {},
 ) {
   const findings = [];
   const add = (f) => {
-    validateFinding(f);
+    validateFinding(f, { isDaemon });
     findings.push(f);
   };
 
   const resolvedPageUrl = finalUrl || (page ? page.url() : targetUrl);
 
   // 1. HTTP status of the page itself.
-  const status = response ? response.status() : 0;
+  const status = response ? response.status() : null;
   if (!response) {
     add({
       rule_id: "http.no_response",
@@ -49,8 +52,13 @@ export async function runChecks(
           `Navigate to ${targetUrl}`,
           "Observe that the server did not return an HTTP response",
         ],
-        raw: { status: 0, requested_url: targetUrl },
+        raw: {
+          status: null,
+          requested_url: targetUrl,
+          error: (loadError?.message || "No response received").slice(0, 300),
+        },
         screenshot,
+        screenshot_error: screenshotError,
         observed_at: observedAt,
         existingEvidence: { requested_url: targetUrl },
       }),
@@ -73,6 +81,7 @@ export async function runChecks(
         ],
         raw: { status, final_url: response.url() },
         screenshot,
+        screenshot_error: screenshotError,
         observed_at: observedAt,
         existingEvidence: { status, final_url: response.url() },
       }),
@@ -92,6 +101,7 @@ export async function runChecks(
         repro_steps: [`Navigate to ${targetUrl}`],
         raw: { status, final_url: response.url() },
         screenshot,
+        screenshot_error: screenshotError,
         observed_at: observedAt,
         existingEvidence: { status, final_url: response.url() },
       }),
@@ -122,6 +132,7 @@ export async function runChecks(
           messages: consoleErrors.slice(0, 20),
         },
         screenshot,
+        screenshot_error: screenshotError,
         observed_at: observedAt,
         existingEvidence: {
           messages: consoleErrors.slice(0, 20).map((m) => (typeof m === "object" ? m.text : m)),
@@ -143,6 +154,7 @@ export async function runChecks(
         repro_steps: [`Navigate to ${targetUrl}`, "Observe console is clean"],
         raw: { count: 0, messages: [] },
         screenshot,
+        screenshot_error: screenshotError,
         observed_at: observedAt,
         existingEvidence: { messages: [] },
       }),
@@ -172,6 +184,7 @@ export async function runChecks(
           requests: failedRequests.slice(0, 20),
         },
         screenshot,
+        screenshot_error: screenshotError,
         observed_at: observedAt,
         existingEvidence: {
           requests: failedRequests.slice(0, 20).map((r) => (typeof r === "object" ? r.url : r)),
@@ -212,6 +225,7 @@ export async function runChecks(
         ],
         raw: { selector: "title", count: 0, outerHTML: "" },
         screenshot,
+        screenshot_error: screenshotError,
         observed_at: observedAt,
         existingEvidence: { title: meta.title },
       }),
@@ -231,6 +245,7 @@ export async function runChecks(
         repro_steps: [`Navigate to ${targetUrl}`],
         raw: { selector: "title", count: 1, title: meta.title },
         screenshot,
+        screenshot_error: screenshotError,
         observed_at: observedAt,
         existingEvidence: { title: meta.title },
       }),
@@ -255,6 +270,7 @@ export async function runChecks(
         ],
         raw: { selector: 'meta[name="description"]', count: 0, outerHTML: "" },
         screenshot,
+        screenshot_error: screenshotError,
         observed_at: observedAt,
         existingEvidence: { description: meta.description },
       }),
@@ -279,6 +295,7 @@ export async function runChecks(
         ],
         raw: { selector: 'meta[name="viewport"]', count: 0, outerHTML: "" },
         screenshot,
+        screenshot_error: screenshotError,
         observed_at: observedAt,
         existingEvidence: { viewport: meta.viewport },
       }),
@@ -307,6 +324,7 @@ export async function runChecks(
           outerHTML: meta.htmlTag.slice(0, 300),
         },
         screenshot,
+        screenshot_error: screenshotError,
         observed_at: observedAt,
         existingEvidence: { lang: meta.lang },
       }),
@@ -342,6 +360,7 @@ export async function runChecks(
           elements: images.map((i) => ({ outerHTML: i.outerHTML })),
         },
         screenshot,
+        screenshot_error: screenshotError,
         observed_at: observedAt,
         existingEvidence: { images: images.map((i) => i.src) },
       }),
@@ -384,6 +403,7 @@ export async function runChecks(
           elements: unlabelled.map((u) => ({ outerHTML: u.outerHTML })),
         },
         screenshot,
+        screenshot_error: screenshotError,
         observed_at: observedAt,
         existingEvidence: { fields: unlabelled.map((u) => u.outerHTML) },
       }),
@@ -483,6 +503,7 @@ export async function runChecks(
           elements: emptyLinks.map((l) => ({ outerHTML: l.outerHTML })),
         },
         screenshot,
+        screenshot_error: screenshotError,
         observed_at: observedAt,
         existingEvidence: { links: emptyLinks.map((l) => l.outerHTML) },
       }),

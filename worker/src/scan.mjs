@@ -5,12 +5,6 @@ import { runChecks } from "./checks.mjs";
 
 export const NAV_TIMEOUT_MS = 30_000;
 
-// 1x1 transparent PNG fallback if screenshot cannot be captured from a failed page
-const BLANK_PNG = Buffer.from(
-  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=",
-  "base64",
-);
-
 /**
  * Shared scan runner for both daemon (index.mjs) and local runner (run-local.mjs).
  *
@@ -20,8 +14,9 @@ const BLANK_PNG = Buffer.from(
  * @param {string} [options.origin]
  * @param {boolean} [options.takeScreenshot=false]
  * @param {string} [options.screenshotPath]
+ * @param {boolean} [options.isDaemon=false]
  * @param {function} [options.onProgress]
- * @returns {Promise<{ findings: Array<object>, finalUrl: string, screenshot: { file: string, sha256: string } | null, aborted?: boolean, abortReason?: string }>}
+ * @returns {Promise<{ findings: Array<object>, finalUrl: string, screenshot: { file: string, sha256: string } | null, screenshotError: string | null, aborted?: boolean, abortReason?: string }>}
  */
 export async function executeScan(
   browser,
@@ -30,6 +25,7 @@ export async function executeScan(
     origin = null,
     takeScreenshot = false,
     screenshotPath = null,
+    isDaemon = false,
     onProgress = async () => {},
   },
 ) {
@@ -47,9 +43,10 @@ export async function executeScan(
   // Exact 3 listeners required by Gate G12
   page.on("console", (msg) => {
     if (msg.type() === "error") {
+      const loc = msg.location();
       consoleErrors.push({
         text: msg.text().slice(0, 300),
-        location: msg.location() ?? {},
+        location: loc && Object.keys(loc).length > 0 ? loc : null,
       });
     }
   });
@@ -58,7 +55,7 @@ export async function executeScan(
     failedRequests.push({
       method: req.method(),
       url: req.url().slice(0, 300),
-      reason: req.failure()?.errorText ?? "unknown",
+      reason: req.failure()?.errorText ?? null,
       status: null,
     });
   });
@@ -101,6 +98,7 @@ export async function executeScan(
           findings: [],
           finalUrl,
           screenshot: null,
+          screenshotError: null,
         };
       }
     } catch {}
@@ -113,20 +111,27 @@ export async function executeScan(
 
   // Handle screenshot if requested
   let screenshot = null;
+  let screenshotError = null;
   if (takeScreenshot && screenshotPath) {
     fs.mkdirSync(path.dirname(screenshotPath), { recursive: true });
     try {
       await page.screenshot({ path: screenshotPath, fullPage: true });
-    } catch {
-      // If page navigation failed or screenshot threw, ensure a valid image file exists
-      fs.writeFileSync(screenshotPath, BLANK_PNG);
+      const buf = fs.readFileSync(screenshotPath);
+      const sha256 = crypto.createHash("sha256").update(buf).digest("hex");
+      screenshot = {
+        file: path.basename(screenshotPath),
+        sha256,
+      };
+    } catch (err) {
+      // If screenshot fails, write no file, set screenshot to null, and record error
+      screenshot = null;
+      screenshotError = (err?.message || "Screenshot failed").slice(0, 300);
+      if (fs.existsSync(screenshotPath)) {
+        try {
+          fs.unlinkSync(screenshotPath);
+        } catch {}
+      }
     }
-    const buf = fs.readFileSync(screenshotPath);
-    const sha256 = crypto.createHash("sha256").update(buf).digest("hex");
-    screenshot = {
-      file: path.basename(screenshotPath),
-      sha256,
-    };
   }
 
   await onProgress(70, "Running checks");
@@ -137,6 +142,9 @@ export async function executeScan(
     consoleErrors,
     failedRequests,
     screenshot,
+    screenshotError,
+    loadError,
+    isDaemon,
     observedAt,
   });
 
@@ -146,6 +154,7 @@ export async function executeScan(
     findings,
     finalUrl,
     screenshot,
+    screenshotError,
     response,
     loadError,
   };

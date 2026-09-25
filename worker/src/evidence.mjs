@@ -8,9 +8,11 @@
  * it is marked with status "needs_review" and a validation_errors array.
  *
  * @param {object} finding
+ * @param {object} [options]
+ * @param {boolean} [options.isDaemon=false]
  * @returns {{ valid: boolean, errors: string[] }}
  */
-export function validateFinding(finding) {
+export function validateFinding(finding, { isDaemon = false } = {}) {
   const errors = [];
 
   if (!finding || typeof finding !== "object") {
@@ -72,7 +74,18 @@ export function validateFinding(finding) {
       }
 
       // screenshot: { file, sha256 } or null
-      if (evidence.screenshot !== null) {
+      if (evidence.screenshot === null) {
+        if (!isDaemon) {
+          if (
+            typeof evidence.screenshot_error !== "string" ||
+            evidence.screenshot_error.trim() === ""
+          ) {
+            errors.push(
+              "In local mode, evidence.screenshot may only be null if evidence.screenshot_error is a non-empty string",
+            );
+          }
+        }
+      } else {
         if (
           typeof evidence.screenshot !== "object" ||
           !evidence.screenshot.file ||
@@ -114,6 +127,7 @@ export function buildEvidence({
   repro_steps,
   raw,
   screenshot = null,
+  screenshot_error = null,
   observed_at = new Date().toISOString(),
   existingEvidence = {},
 }) {
@@ -131,5 +145,6 @@ export function buildEvidence({
     repro_steps: Array.isArray(repro_steps) ? repro_steps : [repro_steps].filter(Boolean),
     raw,
     screenshot: screenshot ? { file: screenshot.file, sha256: screenshot.sha256 } : null,
+    ...(screenshot_error ? { screenshot_error } : {}),
   };
 }
