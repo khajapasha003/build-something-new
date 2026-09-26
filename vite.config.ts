@@ -11,6 +11,8 @@ export default defineConfig(({ command, mode }) => {
   const clientEnv = loadEnv(mode, process.cwd(), "VITE_");
   const isDevBuild = command === "build" && mode === "development";
 
+  const buildVersion = command === "build" ? getBuildVersion() : null;
+
   return {
     server: {
       host: "::",
@@ -56,12 +58,20 @@ export default defineConfig(({ command, mode }) => {
           },
         }
       : {}),
-    define: Object.fromEntries(
-      Object.entries(clientEnv).map(([key, value]) => [
-        `import.meta.env.${key}`,
-        JSON.stringify(value),
-      ]),
-    ),
+    define: {
+      ...Object.fromEntries(
+        Object.entries(clientEnv).map(([key, value]) => [
+          `import.meta.env.${key}`,
+          JSON.stringify(value),
+        ]),
+      ),
+      ...(buildVersion
+        ? {
+            "process.env.APP_VERSION_COMMIT": JSON.stringify(buildVersion.commit),
+            "process.env.APP_VERSION_BUILT_AT": JSON.stringify(buildVersion.builtAt),
+          }
+        : {}),
+    },
     plugins: [
       tailwindcss(),
       tsConfigPaths({ projects: ["./tsconfig.json"] }),
@@ -75,13 +85,21 @@ export default defineConfig(({ command, mode }) => {
           },
         },
       }),
-      command === "build" && nitro(getNitroBuildOptions()),
+      command === "build" &&
+        nitro({
+          defaultPreset: "cloudflare-module",
+          compatibilityDate: "2026-09-25" as const,
+          replace: {
+            "process.env.APP_VERSION_COMMIT": JSON.stringify(buildVersion!.commit),
+            "process.env.APP_VERSION_BUILT_AT": JSON.stringify(buildVersion!.builtAt),
+          },
+        }),
       viteReact(),
     ].filter(Boolean),
   };
 });
 
-function getNitroBuildOptions() {
+function getBuildVersion() {
   let commit: string;
   try {
     commit = execSync("git rev-parse HEAD", {
@@ -112,11 +130,7 @@ function getNitroBuildOptions() {
   }
 
   return {
-    defaultPreset: "cloudflare-module",
-    compatibilityDate: "2026-09-25" as const,
-    replace: {
-      "process.env.APP_VERSION_COMMIT": JSON.stringify(commit),
-      "process.env.APP_VERSION_BUILT_AT": JSON.stringify(new Date().toISOString()),
-    },
+    commit,
+    builtAt: new Date().toISOString(),
   };
 }

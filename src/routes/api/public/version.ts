@@ -19,8 +19,10 @@ export const Route = createFileRoute("/api/public/version")({
 
         return new Response(
           JSON.stringify({
-            commit: process.env["APP_VERSION_COMMIT"],
-            built_at: process.env["APP_VERSION_BUILT_AT"],
+            // @ts-expect-error Injected by Vite define at build time
+            commit: process.env.APP_VERSION_COMMIT,
+            // @ts-expect-error Injected by Vite define at build time
+            built_at: process.env.APP_VERSION_BUILT_AT,
             env_ok,
           }),
           {
