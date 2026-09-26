@@ -6,6 +6,8 @@ param (
     [string]$BaseUrl
 )
 
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
 # Strict parameter validation
 if ([string]::IsNullOrWhiteSpace($Stage) -or ($Stage -ne "preview" -and $Stage -ne "production")) {
     Write-Error "Invalid or missing -Stage. Must be 'preview' or 'production'."
@@ -52,6 +54,13 @@ $StatusOutput = (git status --short)
 if (-not [string]::IsNullOrWhiteSpace($StatusOutput)) {
     Log-Message "REFUSED: Working tree is not clean:"
     Log-Message $StatusOutput
+    exit 1
+}
+
+Log-Message "Fetching latest origin..."
+& git fetch origin
+if ($LASTEXITCODE -ne 0) {
+    Log-Message "ERROR: git fetch origin failed with exit code $LASTEXITCODE"
     exit 1
 }
 
@@ -120,7 +129,8 @@ if ($Stage -eq "preview") {
     }
     $PreviewObj | Add-Member -MemberType NoteProperty -Name "workers_dev" -Value $true -Force
     $PreviewJson = ConvertTo-Json $PreviewObj -Depth 10
-    Set-Content -Path $PreviewConfigPath -Value $PreviewJson -Encoding utf8
+    $PreviewConfigFullPath = Join-Path (Resolve-Path ".output/server").Path "wrangler.preview.json"
+    [IO.File]::WriteAllText($PreviewConfigFullPath, $PreviewJson, (New-Object Text.UTF8Encoding $false))
     
     $DeployConfigFile = $PreviewConfigPath
     $TargetUrl = $BaseUrl.TrimEnd('/')

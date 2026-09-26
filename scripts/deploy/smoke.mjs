@@ -130,7 +130,7 @@ if (failed) {
 }
 
 // 2. Playwright Page Audits
-const PAGES = ["/", "/preorder", "/terms", "/privacy", "/admin"];
+const PAGES = ["/", "/preorder", "/auth", "/terms", "/privacy"];
 
 const browser = await chromium.launch({ headless: true });
 
