@@ -18,6 +18,7 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
 import { Route as AuthenticatedReportScanIdRouteImport } from './routes/_authenticated/report.$scanId'
+import { Route as ApiPublicVersionRouteImport } from './routes/api/public/version'
 import { Route as ApiPublicWorkerClaimRouteImport } from './routes/api/public/worker/claim'
 import { Route as ApiPublicWorkerProgressRouteImport } from './routes/api/public/worker/progress'
 import { Route as ApiPublicWorkerResultRouteImport } from './routes/api/public/worker/result'
@@ -67,6 +68,11 @@ const AuthenticatedReportScanIdRoute =
     path: '/report/$scanId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicVersionRoute = ApiPublicVersionRouteImport.update({
+  id: '/api/public/version',
+  path: '/api/public/version',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicWorkerClaimRoute = ApiPublicWorkerClaimRouteImport.update({
   id: '/api/public/worker/claim',
   path: '/api/public/worker/claim',
@@ -92,6 +98,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRoute
   '/app': typeof AuthenticatedAppRoute
   '/report/$scanId': typeof AuthenticatedReportScanIdRoute
+  '/api/public/version': typeof ApiPublicVersionRoute
   '/api/public/worker/claim': typeof ApiPublicWorkerClaimRoute
   '/api/public/worker/progress': typeof ApiPublicWorkerProgressRoute
   '/api/public/worker/result': typeof ApiPublicWorkerResultRoute
@@ -105,6 +112,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminRoute
   '/app': typeof AuthenticatedAppRoute
   '/report/$scanId': typeof AuthenticatedReportScanIdRoute
+  '/api/public/version': typeof ApiPublicVersionRoute
   '/api/public/worker/claim': typeof ApiPublicWorkerClaimRoute
   '/api/public/worker/progress': typeof ApiPublicWorkerProgressRoute
   '/api/public/worker/result': typeof ApiPublicWorkerResultRoute
@@ -120,6 +128,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/app': typeof AuthenticatedAppRoute
   '/_authenticated/report/$scanId': typeof AuthenticatedReportScanIdRoute
+  '/api/public/version': typeof ApiPublicVersionRoute
   '/api/public/worker/claim': typeof ApiPublicWorkerClaimRoute
   '/api/public/worker/progress': typeof ApiPublicWorkerProgressRoute
   '/api/public/worker/result': typeof ApiPublicWorkerResultRoute
@@ -135,6 +144,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/app'
     | '/report/$scanId'
+    | '/api/public/version'
     | '/api/public/worker/claim'
     | '/api/public/worker/progress'
     | '/api/public/worker/result'
@@ -148,6 +158,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/app'
     | '/report/$scanId'
+    | '/api/public/version'
     | '/api/public/worker/claim'
     | '/api/public/worker/progress'
     | '/api/public/worker/result'
@@ -162,6 +173,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/app'
     | '/_authenticated/report/$scanId'
+    | '/api/public/version'
     | '/api/public/worker/claim'
     | '/api/public/worker/progress'
     | '/api/public/worker/result'
@@ -174,6 +186,7 @@ export interface RootRouteChildren {
   PreorderRoute: typeof PreorderRoute
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
+  ApiPublicVersionRoute: typeof ApiPublicVersionRoute
   ApiPublicWorkerClaimRoute: typeof ApiPublicWorkerClaimRoute
   ApiPublicWorkerProgressRoute: typeof ApiPublicWorkerProgressRoute
   ApiPublicWorkerResultRoute: typeof ApiPublicWorkerResultRoute
@@ -244,6 +257,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedReportScanIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/version': {
+      id: '/api/public/version'
+      path: '/api/public/version'
+      fullPath: '/api/public/version'
+      preLoaderRoute: typeof ApiPublicVersionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/worker/claim': {
       id: '/api/public/worker/claim'
       path: '/api/public/worker/claim'
@@ -290,6 +310,7 @@ const rootRouteChildren: RootRouteChildren = {
   PreorderRoute: PreorderRoute,
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
+  ApiPublicVersionRoute: ApiPublicVersionRoute,
   ApiPublicWorkerClaimRoute: ApiPublicWorkerClaimRoute,
   ApiPublicWorkerProgressRoute: ApiPublicWorkerProgressRoute,
   ApiPublicWorkerResultRoute: ApiPublicWorkerResultRoute,
@@ -307,3 +328,4 @@ declare module '@tanstack/react-start' {
     config: Awaited<ReturnType<typeof startInstance.getOptions>>
   }
 }
+
