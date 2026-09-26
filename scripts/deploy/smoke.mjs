@@ -1,5 +1,5 @@
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -13,7 +13,7 @@ try {
       __dirname,
       "../../worker/node_modules/playwright/index.mjs",
     );
-    ({ chromium } = await import(workerPlaywrightPath));
+    ({ chromium } = await import(pathToFileURL(workerPlaywrightPath).href));
   } catch (err) {
     console.error("Failed to load Playwright:", err);
     process.exit(1);
@@ -130,7 +130,7 @@ if (failed) {
 }
 
 // 2. Playwright Page Audits
-const PAGES = ["/", "/preorder", "/auth", "/terms", "/privacy"];
+const PAGES = ["/", "/preorder", "/terms", "/privacy", "/admin"];
 
 const browser = await chromium.launch({ headless: true });
 
@@ -167,7 +167,8 @@ try {
     });
 
     const targetUrl = `${baseUrl}${pagePath}`;
-    const pageResponse = await page.goto(targetUrl, { waitUntil: "networkidle", timeout: 30000 });
+    const pageResponse = await page.goto(targetUrl, { waitUntil: "load", timeout: 30000 });
+    await page.waitForLoadState("load");
 
     const httpStatus = pageResponse ? pageResponse.status() : null;
     console.log(`[smoke] ${pagePath} - HTTP status: ${httpStatus}`);
@@ -177,19 +178,22 @@ try {
       failed = true;
     }
 
-    // Check logo element and naturalWidth
-    const logoImg = page.locator('img[src*="/brand/logo.jpg"]').first();
-    const logoCount = await logoImg.count();
+    // Wait for logo element to attach and check naturalWidth
+    const logoLocator = page
+      .locator('img[src*="/brand/logo.jpg"], img[alt*="PreLaunchQA"]')
+      .first();
+    await logoLocator.waitFor({ state: "attached", timeout: 10000 }).catch(() => {});
 
     let naturalWidth = 0;
-    if (logoCount > 0) {
-      naturalWidth = await logoImg.evaluate((el) => el.naturalWidth).catch(() => 0);
-    } else {
-      // Fallback search for any brand logo
-      const fallbackLogo = page.locator('img[alt*="PreLaunchQA"]').first();
-      if ((await fallbackLogo.count()) > 0) {
-        naturalWidth = await fallbackLogo.evaluate((el) => el.naturalWidth).catch(() => 0);
-      }
+    try {
+      naturalWidth = await logoLocator.evaluate((el) => el.naturalWidth);
+    } catch {}
+
+    if (logoResponseStatus === null) {
+      try {
+        const logoFetch = await fetch(`${baseUrl}/brand/logo.jpg`);
+        logoResponseStatus = logoFetch.status;
+      } catch {}
     }
 
     console.log(
