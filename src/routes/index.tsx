@@ -198,8 +198,8 @@ function Index() {
           <div className="rounded-3xl border border-amber/30 bg-amber/5 p-6 sm:p-8">
             <h2 className="text-xl text-amber">Where a human still decides</h2>
             <p className="mt-3 max-w-3xl text-sm text-muted-foreground">
-              Scanning, reporting, re-tests and billing run automatically. Three things stay with a
-              person on purpose: authorising a scan of an app, approving any outreach before it is
+              Once checks go live, scanning and reporting run automatically. Three things stay with
+              a person on purpose: authorising a scan of an app, approving any outreach before it is
               sent, and deciding refunds. Anything else would put you on the wrong side of
               permission rules.
             </p>
