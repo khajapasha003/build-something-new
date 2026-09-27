@@ -26,7 +26,7 @@ export const Route = createFileRoute("/privacy")({
 const sections = [
   {
     title: "What we collect right now",
-    body: "If you join the list or pre-order, we store your email address, the app URL you entered, which builder you selected, whether you agreed to product emails, and a one-way fingerprint of your network address used solely to limit abuse of the form. Nothing else.",
+    body: "If you join the list or pre-order, we store your email address, the app URL you entered, which builder you selected, whether you agreed to product emails, and a one-way fingerprint of your network address used solely to limit abuse of the form. Nothing else. We use Cloudflare Web Analytics to count page visits. It does not set cookies.",
   },
   {
     title: "Who can see it",
