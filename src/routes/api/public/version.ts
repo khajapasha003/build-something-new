@@ -7,6 +7,7 @@ export const Route = createFileRoute("/api/public/version")({
         const supabaseUrl = process.env["SUPABASE_URL"];
         const supabasePublishableKey = process.env["SUPABASE_PUBLISHABLE_KEY"];
         const supabaseServiceRoleKey = process.env["SUPABASE_SERVICE_ROLE_KEY"];
+        const ipHashKey = process.env["IP_HASH_KEY"];
 
         const env_ok = Boolean(
           typeof supabaseUrl === "string" &&
@@ -14,7 +15,9 @@ export const Route = createFileRoute("/api/public/version")({
           typeof supabasePublishableKey === "string" &&
           supabasePublishableKey.trim().length > 0 &&
           typeof supabaseServiceRoleKey === "string" &&
-          supabaseServiceRoleKey.trim().length > 0,
+          supabaseServiceRoleKey.trim().length > 0 &&
+          typeof ipHashKey === "string" &&
+          ipHashKey.trim().length > 0,
         );
 
         return new Response(
