@@ -209,31 +209,81 @@ function Index() {
         <section className="mx-auto max-w-6xl px-6 pb-20">
           <h2 className="text-2xl sm:text-3xl">Pricing</h2>
           <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
-            Final prices are set when the first paid checks go live. Pre-order now and we confirm
-            your price by email before charging anything.
+            Clear, transparent pricing. Run a free sample check on your homepage or unlock deep
+            audits and continuous re-testing.
           </p>
           <div className="mt-8 grid gap-4 sm:grid-cols-3">
             {[
               {
-                name: "Sample scan",
+                name: "Sample Scan",
                 price: "Free",
+                period: "",
+                badge: "Get started",
                 body: "Single-page check. Shows you the report format and raw browser evidence on your homepage.",
+                cta: "Start free check",
+                href: "/auth",
+                highlight: false,
               },
               {
-                name: "Launch check (Coming next)",
-                price: "One-time",
-                body: "Pre-order: Multi-page crawl, interactive critical flows, responsive pass, full evidence bundle, one re-scan.",
+                name: "Launch Check",
+                price: "$49",
+                period: "one-time",
+                badge: "Most popular",
+                body: "Deep pre-launch check: multi-page crawl, interactive critical flows, full evidence bundle, 5 scan credits, and 1 included re-scan comparison.",
+                cta: "Get launch check",
+                href: "/auth",
+                highlight: true,
               },
               {
-                name: "Re-test plan (Coming next)",
-                price: "Monthly",
-                body: "Scheduled re-runs with a before/after diff after each deploy cycle.",
+                name: "Monthly Re-test",
+                price: "$99",
+                period: "/month",
+                badge: "Continuous QA",
+                body: "Unlimited automated checks, before/after deploy comparison diffs, priority worker queue, and automatic failure alerts.",
+                cta: "Subscribe monthly",
+                href: "/auth",
+                highlight: false,
               },
             ].map((tier) => (
-              <div key={tier.name} className="rounded-2xl border border-border bg-card p-6">
-                <h3 className="text-lg">{tier.name}</h3>
-                <p className="mt-1 font-display text-2xl text-primary">{tier.price}</p>
-                <p className="mt-3 text-sm text-muted-foreground">{tier.body}</p>
+              <div
+                key={tier.name}
+                className={`relative flex flex-col justify-between rounded-2xl border p-6 ${
+                  tier.highlight
+                    ? "border-primary/50 bg-primary/5 shadow-lg shadow-primary/5"
+                    : "border-border bg-card"
+                }`}
+              >
+                <div>
+                  <div className="flex items-center justify-between gap-2">
+                    <h3 className="text-lg font-semibold">{tier.name}</h3>
+                    {tier.badge && (
+                      <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
+                        {tier.badge}
+                      </span>
+                    )}
+                  </div>
+                  <div className="mt-3 flex items-baseline gap-1">
+                    <span className="font-display text-3xl font-bold text-foreground">
+                      {tier.price}
+                    </span>
+                    {tier.period && (
+                      <span className="text-xs text-muted-foreground">{tier.period}</span>
+                    )}
+                  </div>
+                  <p className="mt-3 text-sm text-muted-foreground">{tier.body}</p>
+                </div>
+                <div className="mt-6 pt-2">
+                  <Link
+                    to={tier.href}
+                    className={`block w-full rounded-xl py-2.5 text-center text-sm font-semibold transition ${
+                      tier.highlight
+                        ? "bg-primary text-primary-foreground hover:brightness-110"
+                        : "border border-border bg-muted/60 text-foreground hover:bg-muted"
+                    }`}
+                  >
+                    {tier.cta}
+                  </Link>
+                </div>
               </div>
             ))}
           </div>
