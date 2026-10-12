@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
+import { BrandLogo } from "@/components/BrandLogo";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -83,8 +84,11 @@ function AuthPage() {
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
       <main className="mx-auto max-w-md px-6 py-16 sm:py-24">
-        <h1 className="text-3xl sm:text-4xl">Sign in</h1>
-        <p className="mt-4 text-sm text-muted-foreground">
+        <div className="mb-6 flex justify-center">
+          <BrandLogo className="h-10 w-auto" />
+        </div>
+        <h1 className="text-center text-3xl sm:text-4xl font-bold">Sign in</h1>
+        <p className="mt-3 text-center text-sm text-muted-foreground">
           Use a sign-in link sent to your email, or continue with Google. Accounts are only used to
           add apps and prove you own them.
         </p>

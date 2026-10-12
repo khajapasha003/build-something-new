@@ -35,7 +35,14 @@ export function SiteFooter() {
   return (
     <footer className="border-t border-border/60">
       <div className="mx-auto flex max-w-6xl flex-col gap-4 px-6 py-10 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-        <p>PreLaunchQA — real browser checks before launch. Launch with proof.</p>
+        <div className="flex flex-wrap items-center gap-3">
+          <Link to="/" className="flex items-center">
+            <BrandLogo className="h-6 w-auto opacity-90 transition hover:opacity-100" />
+          </Link>
+          <span className="text-xs text-muted-foreground/80">
+            Real browser checks before launch. Launch with proof.
+          </span>
+        </div>
         <nav className="flex gap-5">
           <Link to="/status" className="transition hover:text-foreground">
             Status
