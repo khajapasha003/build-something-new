@@ -13,6 +13,9 @@ export function SiteHeader() {
           <Link to="/preorder" className="transition hover:text-foreground">
             Pre-order
           </Link>
+          <Link to="/support" className="transition hover:text-foreground">
+            Support
+          </Link>
           <Link to="/auth" className="transition hover:text-foreground">
             Sign in
           </Link>
@@ -34,6 +37,12 @@ export function SiteFooter() {
       <div className="mx-auto flex max-w-6xl flex-col gap-4 px-6 py-10 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
         <p>PreLaunchQA — real browser checks before launch. Launch with proof.</p>
         <nav className="flex gap-5">
+          <Link to="/status" className="transition hover:text-foreground">
+            Status
+          </Link>
+          <Link to="/support" className="transition hover:text-foreground">
+            Support
+          </Link>
           <Link to="/terms" className="transition hover:text-foreground">
             Terms
           </Link>

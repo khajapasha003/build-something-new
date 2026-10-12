@@ -335,6 +335,153 @@ export type Database = {
         };
         Relationships: [];
       };
+      user_credits: {
+        Row: {
+          created_at: string;
+          plan: Database["public"]["Enums"]["billing_plan"];
+          scan_credits: number;
+          unlimited_scans: boolean;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          plan?: Database["public"]["Enums"]["billing_plan"];
+          scan_credits?: number;
+          unlimited_scans?: boolean;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          plan?: Database["public"]["Enums"]["billing_plan"];
+          scan_credits?: number;
+          unlimited_scans?: boolean;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
+      orders: {
+        Row: {
+          amount: number;
+          created_at: string;
+          currency: string;
+          id: string;
+          plan: Database["public"]["Enums"]["billing_plan"];
+          receipt_url: string | null;
+          status: Database["public"]["Enums"]["order_status"];
+          stripe_payment_intent_id: string | null;
+          stripe_session_id: string | null;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          amount: number;
+          created_at?: string;
+          currency?: string;
+          id?: string;
+          plan: Database["public"]["Enums"]["billing_plan"];
+          receipt_url?: string | null;
+          status?: Database["public"]["Enums"]["order_status"];
+          stripe_payment_intent_id?: string | null;
+          stripe_session_id?: string | null;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          amount?: number;
+          created_at?: string;
+          currency?: string;
+          id?: string;
+          plan?: Database["public"]["Enums"]["billing_plan"];
+          receipt_url?: string | null;
+          status?: Database["public"]["Enums"]["order_status"];
+          stripe_payment_intent_id?: string | null;
+          stripe_session_id?: string | null;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
+      subscriptions: {
+        Row: {
+          cancel_at_period_end: boolean;
+          created_at: string;
+          current_period_end: string | null;
+          current_period_start: string | null;
+          id: string;
+          plan: Database["public"]["Enums"]["billing_plan"];
+          status: Database["public"]["Enums"]["subscription_status"];
+          stripe_customer_id: string | null;
+          stripe_subscription_id: string | null;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          cancel_at_period_end?: boolean;
+          created_at?: string;
+          current_period_end?: string | null;
+          current_period_start?: string | null;
+          id?: string;
+          plan?: Database["public"]["Enums"]["billing_plan"];
+          status?: Database["public"]["Enums"]["subscription_status"];
+          stripe_customer_id?: string | null;
+          stripe_subscription_id?: string | null;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          cancel_at_period_end?: boolean;
+          created_at?: string;
+          current_period_end?: string | null;
+          current_period_start?: string | null;
+          id?: string;
+          plan?: Database["public"]["Enums"]["billing_plan"];
+          status?: Database["public"]["Enums"]["subscription_status"];
+          stripe_customer_id?: string | null;
+          stripe_subscription_id?: string | null;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
+      support_tickets: {
+        Row: {
+          category: Database["public"]["Enums"]["ticket_category"];
+          created_at: string;
+          email: string;
+          id: string;
+          message: string;
+          status: Database["public"]["Enums"]["ticket_status"];
+          subject: string;
+          updated_at: string;
+          user_id: string | null;
+        };
+        Insert: {
+          category?: Database["public"]["Enums"]["ticket_category"];
+          created_at?: string;
+          email: string;
+          id?: string;
+          message: string;
+          status?: Database["public"]["Enums"]["ticket_status"];
+          subject: string;
+          updated_at?: string;
+          user_id?: string | null;
+        };
+        Update: {
+          category?: Database["public"]["Enums"]["ticket_category"];
+          created_at?: string;
+          email?: string;
+          id?: string;
+          message?: string;
+          status?: Database["public"]["Enums"]["ticket_status"];
+          subject?: string;
+          updated_at?: string;
+          user_id?: string | null;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;
@@ -350,6 +497,11 @@ export type Database = {
     };
     Enums: {
       app_role: "admin" | "moderator" | "user";
+      billing_plan: "sample" | "launch" | "retest";
+      order_status: "pending" | "succeeded" | "failed" | "refunded";
+      subscription_status: "active" | "canceled" | "past_due" | "trialing" | "incomplete";
+      ticket_category: "general" | "verification" | "scan_issue" | "billing" | "feature_request";
+      ticket_status: "open" | "in_progress" | "resolved";
     };
     CompositeTypes: {
       [_ in never]: never;

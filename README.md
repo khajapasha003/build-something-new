@@ -32,6 +32,13 @@ Current migrations, in order:
 1. `20260919104259_…` — `waitlist` table (pre-order / early-access signups, server-only access)
 2. `20260919213026_…` — Phase 1: `profiles`, `apps`, `verification_attempts` tables with per-user RLS, the one-verified-owner-per-origin rule, and the auto-create-profile trigger
 3. `20260919213048_…` — locks down the profile trigger function so only the system can run it
+4. `20260920084816_…` — Phase 2: `scans`, `findings`, `scan_events` tables with owner-only access and single-active-scan constraint
+5. `20260921034803_…` — `user_roles` and finding moderation review fields
+6. `20260921034826_…` — scan queue indexes and performance constraints
+7. `20260925143000_…` — ownership-gate bypass fix: column-level grants and trigger enforcement
+8. `20260928000000_…` — unkeyed legacy IP hash migration to HMAC-SHA256
+9. `20261013120000_…` — Phase 4: `user_credits`, `orders`, `subscriptions` tables with RLS and credit auto-provisioning
+10. `20261013120001_…` — Phase 5: `support_tickets` table and RLS policies
 
 ## Development
 

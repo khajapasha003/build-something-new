@@ -14,6 +14,12 @@ import {
   type AppRow,
   type VerificationMethod,
 } from "@/lib/apps.functions";
+import {
+  BILLING_PLANS,
+  createCheckoutSession,
+  getBillingOverview,
+  type PlanKey,
+} from "@/lib/billing.functions";
 import { cancelScan, listScans, requestScan, type ScanRow } from "@/lib/scans.functions";
 
 const ACTIVE_SCAN_STATUSES = ["queued", "claimed", "running"] as const;
@@ -108,6 +114,8 @@ function Dashboard() {
   const fetchScans = useServerFn(listScans);
   const startScan = useServerFn(requestScan);
   const stopScan = useServerFn(cancelScan);
+  const fetchBilling = useServerFn(getBillingOverview);
+  const checkoutFn = useServerFn(createCheckoutSession);
 
   const appsQuery = useQuery({ queryKey: ["apps"], queryFn: () => fetchApps() });
   const scansQuery = useQuery({
@@ -115,6 +123,7 @@ function Dashboard() {
     queryFn: () => fetchScans(),
     refetchInterval: (query) => ((query.state.data ?? []).some(isActive) ? 4000 : false),
   });
+  const billingQuery = useQuery({ queryKey: ["billing"], queryFn: () => fetchBilling() });
 
   const [url, setUrl] = useState("");
   const [builtWith, setBuiltWith] = useState<(typeof BUILT_WITH)[number]>("Lovable");
@@ -123,6 +132,9 @@ function Dashboard() {
   const [openAppId, setOpenAppId] = useState<string | null>(null);
   const [method, setMethod] = useState<VerificationMethod>("meta");
   const [verifying, setVerifying] = useState(false);
+  const [showBilling, setShowBilling] = useState(false);
+  const [checkingOut, setCheckingOut] = useState<string | null>(null);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [verifyMessage, setVerifyMessage] = useState<{
     appId: string;
     ok: boolean;
@@ -132,6 +144,29 @@ function Dashboard() {
 
   const apps = appsQuery.data ?? [];
   const scans = scansQuery.data ?? [];
+  const billing = billingQuery.data;
+
+  async function onUpgrade(planId: "launch" | "retest") {
+    setCheckingOut(planId);
+    setCheckoutError(null);
+    try {
+      const res = await checkoutFn({ data: { planId } });
+      if (res.ok) {
+        if (res.url.startsWith("http")) {
+          window.location.href = res.url;
+        } else {
+          await queryClient.invalidateQueries({ queryKey: ["billing"] });
+          setShowBilling(false);
+        }
+      } else {
+        setCheckoutError(res.error);
+      }
+    } catch (err: any) {
+      setCheckoutError(err.message || "Failed to initiate checkout");
+    } finally {
+      setCheckingOut(null);
+    }
+  }
 
   async function onRunCheck(app: AppRow) {
     setScanMessage(null);
@@ -176,7 +211,27 @@ function Dashboard() {
       <SiteHeader />
       <main className="mx-auto max-w-4xl px-6 py-12 sm:py-16">
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <h1 className="text-3xl sm:text-4xl">Your apps</h1>
+          <div>
+            <h1 className="text-3xl sm:text-4xl">Your apps</h1>
+            <div className="mt-2 flex flex-wrap items-center gap-3 text-xs">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 font-medium">
+                <span className="size-2 rounded-full bg-mint"></span>
+                Plan: {billing?.unlimitedScans ? "Unlimited Re-test" : billing?.plan === "launch" ? "Launch Pack" : "Free Sample"}
+              </span>
+              <span className="text-muted-foreground">
+                {billing?.unlimitedScans
+                  ? "Unlimited checks active"
+                  : `${billing?.scanCredits ?? 1} check credit${(billing?.scanCredits ?? 1) === 1 ? "" : "s"} remaining`}
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowBilling(true)}
+                className="font-medium text-primary underline hover:brightness-110"
+              >
+                Upgrade / Buy checks →
+              </button>
+            </div>
+          </div>
           <button
             type="button"
             onClick={signOut}
@@ -430,6 +485,109 @@ function Dashboard() {
             })
           )}
         </section>
+
+        {/* Billing & Upgrade Modal */}
+        {showBilling && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+            <div className="relative w-full max-w-2xl rounded-3xl border border-border bg-card p-6 sm:p-8 shadow-2xl">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold">Choose a check plan</h2>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Get more check credits or unlock continuous re-test monitoring.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowBilling(false)}
+                  className="rounded-lg border border-border p-2 text-sm text-muted-foreground hover:text-foreground"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {checkoutError && (
+                <div className="mt-4 rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+                  {checkoutError}
+                </div>
+              )}
+
+              <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                {/* Launch Check Pack */}
+                <div className="flex flex-col justify-between rounded-2xl border border-border bg-background p-6">
+                  <div>
+                    <span className="inline-block rounded-full bg-primary/20 px-2.5 py-0.5 text-xs font-semibold text-primary">
+                      Most Popular
+                    </span>
+                    <h3 className="mt-2 text-xl font-bold">{BILLING_PLANS.launch.name}</h3>
+                    <p className="mt-1 text-2xl font-bold text-foreground">
+                      {BILLING_PLANS.launch.priceDisplay}
+                    </p>
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      {BILLING_PLANS.launch.description}
+                    </p>
+                    <ul className="mt-4 space-y-2 text-xs text-muted-foreground">
+                      {BILLING_PLANS.launch.features.map((feat) => (
+                        <li key={feat} className="flex items-center gap-2">
+                          <span className="size-1.5 rounded-full bg-mint"></span>
+                          <span>{feat}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <button
+                    type="button"
+                    disabled={checkingOut !== null}
+                    onClick={() => onUpgrade("launch")}
+                    className="mt-6 w-full rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition hover:brightness-110 disabled:opacity-60"
+                  >
+                    {checkingOut === "launch" ? "Preparing checkout..." : "Buy 5 Checks ($49)"}
+                  </button>
+                </div>
+
+                {/* Monthly Re-test Plan */}
+                <div className="flex flex-col justify-between rounded-2xl border border-primary/40 bg-primary/5 p-6">
+                  <div>
+                    <span className="inline-block rounded-full bg-mint/20 px-2.5 py-0.5 text-xs font-semibold text-mint">
+                      Continuous QA
+                    </span>
+                    <h3 className="mt-2 text-xl font-bold">{BILLING_PLANS.retest.name}</h3>
+                    <p className="mt-2 text-2xl font-bold text-primary">
+                      {BILLING_PLANS.retest.priceDisplay}
+                    </p>
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      {BILLING_PLANS.retest.description}
+                    </p>
+                    <ul className="mt-4 space-y-2 text-xs text-muted-foreground">
+                      {BILLING_PLANS.retest.features.map((feat) => (
+                        <li key={feat} className="flex items-center gap-2">
+                          <span className="size-1.5 rounded-full bg-primary"></span>
+                          <span>{feat}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <button
+                    type="button"
+                    disabled={checkingOut !== null}
+                    onClick={() => onUpgrade("retest")}
+                    className="mt-6 w-full rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition hover:brightness-110 disabled:opacity-60"
+                  >
+                    {checkingOut === "retest" ? "Preparing checkout..." : "Subscribe ($99/mo)"}
+                  </button>
+                </div>
+              </div>
+
+              <div className="mt-6 border-t border-border pt-4 text-center text-xs text-muted-foreground">
+                <p>
+                  Secure checkout powered by Stripe. 7-day money-back satisfaction guarantee.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
       <SiteFooter />
     </div>

@@ -15,6 +15,8 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as PreorderRouteImport } from './routes/preorder'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as SupportRouteImport } from './routes/support'
+import { Route as StatusRouteImport } from './routes/status'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
 import { Route as AuthenticatedReportScanIdRouteImport } from './routes/_authenticated/report.$scanId'
@@ -22,6 +24,7 @@ import { Route as ApiPublicVersionRouteImport } from './routes/api/public/versio
 import { Route as ApiPublicWorkerClaimRouteImport } from './routes/api/public/worker/claim'
 import { Route as ApiPublicWorkerProgressRouteImport } from './routes/api/public/worker/progress'
 import { Route as ApiPublicWorkerResultRouteImport } from './routes/api/public/worker/result'
+import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe/webhook'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -50,6 +53,16 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SupportRoute = SupportRouteImport.update({
+  id: '/support',
+  path: '/support',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StatusRoute = StatusRouteImport.update({
+  id: '/status',
+  path: '/status',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
@@ -88,6 +101,11 @@ const ApiPublicWorkerResultRoute = ApiPublicWorkerResultRouteImport.update({
   path: '/api/public/worker/result',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
+  id: '/api/public/stripe/webhook',
+  path: '/api/public/stripe/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -95,6 +113,8 @@ export interface FileRoutesByFullPath {
   '/preorder': typeof PreorderRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
+  '/support': typeof SupportRoute
+  '/status': typeof StatusRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/app': typeof AuthenticatedAppRoute
   '/report/$scanId': typeof AuthenticatedReportScanIdRoute
@@ -102,6 +122,7 @@ export interface FileRoutesByFullPath {
   '/api/public/worker/claim': typeof ApiPublicWorkerClaimRoute
   '/api/public/worker/progress': typeof ApiPublicWorkerProgressRoute
   '/api/public/worker/result': typeof ApiPublicWorkerResultRoute
+  '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -109,6 +130,8 @@ export interface FileRoutesByTo {
   '/preorder': typeof PreorderRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
+  '/support': typeof SupportRoute
+  '/status': typeof StatusRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/app': typeof AuthenticatedAppRoute
   '/report/$scanId': typeof AuthenticatedReportScanIdRoute
@@ -116,6 +139,7 @@ export interface FileRoutesByTo {
   '/api/public/worker/claim': typeof ApiPublicWorkerClaimRoute
   '/api/public/worker/progress': typeof ApiPublicWorkerProgressRoute
   '/api/public/worker/result': typeof ApiPublicWorkerResultRoute
+  '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -125,6 +149,8 @@ export interface FileRoutesById {
   '/preorder': typeof PreorderRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
+  '/support': typeof SupportRoute
+  '/status': typeof StatusRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/app': typeof AuthenticatedAppRoute
   '/_authenticated/report/$scanId': typeof AuthenticatedReportScanIdRoute
@@ -132,6 +158,7 @@ export interface FileRoutesById {
   '/api/public/worker/claim': typeof ApiPublicWorkerClaimRoute
   '/api/public/worker/progress': typeof ApiPublicWorkerProgressRoute
   '/api/public/worker/result': typeof ApiPublicWorkerResultRoute
+  '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -141,6 +168,8 @@ export interface FileRouteTypes {
     | '/preorder'
     | '/privacy'
     | '/terms'
+    | '/support'
+    | '/status'
     | '/admin'
     | '/app'
     | '/report/$scanId'
@@ -148,6 +177,7 @@ export interface FileRouteTypes {
     | '/api/public/worker/claim'
     | '/api/public/worker/progress'
     | '/api/public/worker/result'
+    | '/api/public/stripe/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -155,6 +185,8 @@ export interface FileRouteTypes {
     | '/preorder'
     | '/privacy'
     | '/terms'
+    | '/support'
+    | '/status'
     | '/admin'
     | '/app'
     | '/report/$scanId'
@@ -162,6 +194,7 @@ export interface FileRouteTypes {
     | '/api/public/worker/claim'
     | '/api/public/worker/progress'
     | '/api/public/worker/result'
+    | '/api/public/stripe/webhook'
   id:
     | '__root__'
     | '/'
@@ -170,6 +203,8 @@ export interface FileRouteTypes {
     | '/preorder'
     | '/privacy'
     | '/terms'
+    | '/support'
+    | '/status'
     | '/_authenticated/admin'
     | '/_authenticated/app'
     | '/_authenticated/report/$scanId'
@@ -177,6 +212,7 @@ export interface FileRouteTypes {
     | '/api/public/worker/claim'
     | '/api/public/worker/progress'
     | '/api/public/worker/result'
+    | '/api/public/stripe/webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -186,10 +222,13 @@ export interface RootRouteChildren {
   PreorderRoute: typeof PreorderRoute
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
+  SupportRoute: typeof SupportRoute
+  StatusRoute: typeof StatusRoute
   ApiPublicVersionRoute: typeof ApiPublicVersionRoute
   ApiPublicWorkerClaimRoute: typeof ApiPublicWorkerClaimRoute
   ApiPublicWorkerProgressRoute: typeof ApiPublicWorkerProgressRoute
   ApiPublicWorkerResultRoute: typeof ApiPublicWorkerResultRoute
+  ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -234,6 +273,20 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/support': {
+      id: '/support'
+      path: '/support'
+      fullPath: '/support'
+      preLoaderRoute: typeof SupportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/status': {
+      id: '/status'
+      path: '/status'
+      fullPath: '/status'
+      preLoaderRoute: typeof StatusRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin': {
@@ -285,6 +338,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicWorkerResultRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/stripe/webhook': {
+      id: '/api/public/stripe/webhook'
+      path: '/api/public/stripe/webhook'
+      fullPath: '/api/public/stripe/webhook'
+      preLoaderRoute: typeof ApiPublicStripeWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -310,10 +370,13 @@ const rootRouteChildren: RootRouteChildren = {
   PreorderRoute: PreorderRoute,
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
+  SupportRoute: SupportRoute,
+  StatusRoute: StatusRoute,
   ApiPublicVersionRoute: ApiPublicVersionRoute,
   ApiPublicWorkerClaimRoute: ApiPublicWorkerClaimRoute,
   ApiPublicWorkerProgressRoute: ApiPublicWorkerProgressRoute,
   ApiPublicWorkerResultRoute: ApiPublicWorkerResultRoute,
+  ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

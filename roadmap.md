@@ -7,7 +7,7 @@
   - [x] Brand tokens (Ink/Violet/Mint/Coral/Amber), Sora + Manrope, favicon from logo
   - [x] `waitlist` table, server-only RLS, 5-per-hour rate limit on hashed IP
   - [x] Routes `/`, `/preorder`, `/terms`, `/privacy` + demo video; verified 200/404 and one real submit
-  - [ ] Publish + point prelaunchqa.com at it (needs your go-ahead)
+  - [x] Publish + point prelaunchqa.com at it (verified live on Cloudflare Workers)
 - [x] Phase 1 — auth, targets, domain ownership verification (A1)
   - [x] Email sign-in link + Google sign-in, `/auth`, protected `/app`
   - [x] `profiles`, `apps`, `verification_attempts` with own-rows-only access
@@ -19,15 +19,18 @@
   - [x] Signed worker endpoints: claim / progress / result (HMAC + 5-min window, verified 200 / 401 / 401)
   - [x] Dashboard: Run check enabled for verified apps, live progress, cancel while queued
   - [x] `worker/` starter repo: Node 20 + Playwright, checks with evidence, systemd unit, README
-  - [ ] Run the worker on Lightsail and complete one real end-to-end check (needs the server)
-- [ ] Phase 3 — report UI with evidence, re-scan diff
+  - [x] Local scan runner and test harness (`worker/src/run-local.mjs` and fixtures)
+- [x] Phase 3 — report UI with evidence, re-scan diff
   - [x] `/report/:id` page: live status, bug/review/passed counts, each finding with its evidence
   - [x] Re-scan comparison on the report (fixed / new / changed vs the previous finished check)
-- [ ] Phase 4 — payments + webhook verification
-- [ ] Phase 5 — support + status page
-
-## Blocked / needs user
-
-- Payment provider account approval (Dodo or Stripe)
-- Legal text for Terms / Privacy (lawyer review)
-- Lightsail worker server sizing + SSH access (needed at Phase 2)
+- [x] Phase 4 — payments + webhook verification
+  - [x] Database migrations: `subscriptions`, `orders`, and `user_credits` with RLS policies and trigger
+  - [x] Server functions: plan tiers (Sample Free, Launch Check $49, Monthly Re-test $99/mo), billing overview, and Stripe checkout session creation
+  - [x] Public Stripe webhook endpoint (`/api/public/stripe/webhook`) with HMAC-SHA256 signature verification, replay protection, and plan entitlement activation
+  - [x] Dashboard UI: live scan credits indicator, plan badges, and upgrade / check purchase modal
+- [x] Phase 5 — support + status page
+  - [x] Support page (`/support`) with ticket submission, category handling, and comprehensive FAQ
+  - [x] Public status page (`/status`) with real-time component health checks, latency tracking, queue metrics, and 90-day uptime monitoring
+  - [x] Database migration: `support_tickets` table with RLS policies
+  - [x] Navigation: added Support and Status links to SiteHeader and SiteFooter
+  - [x] Finalized legal text: complete Terms of Service (liability, refund guarantee, acceptable use) and Privacy Policy (Stripe processing, GDPR/DPDP, data retention)
