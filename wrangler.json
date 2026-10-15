@@ -1,9 +1,13 @@
 {
   "name": "prelaunchqa",
+  "main": ".output/server/index.mjs",
   "compatibility_date": "2026-09-25",
   "compatibility_flags": [
     "nodejs_compat"
   ],
+  "assets": {
+    "directory": ".output/public"
+  },
   "routes": [
     {
       "pattern": "prelaunchqa.com",
