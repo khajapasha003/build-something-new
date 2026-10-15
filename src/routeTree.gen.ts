@@ -12,14 +12,16 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as GuidesRouteImport } from './routes/guides'
 import { Route as PreorderRouteImport } from './routes/preorder'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as StatusRouteImport } from './routes/status'
+import { Route as ReportScanIdRouteImport } from './routes/report.$scanId'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
-import { Route as AuthenticatedReportScanIdRouteImport } from './routes/_authenticated/report.$scanId'
+import { Route as ApiPublicBadgeRouteImport } from './routes/api/public/badge'
 import { Route as ApiPublicVersionRouteImport } from './routes/api/public/version'
 import { Route as ApiPublicWorkerClaimRouteImport } from './routes/api/public/worker/claim'
 import { Route as ApiPublicWorkerProgressRouteImport } from './routes/api/public/worker/progress'
@@ -38,6 +40,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuidesRoute = GuidesRouteImport.update({
+  id: '/guides',
+  path: '/guides',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PreorderRoute = PreorderRouteImport.update({
@@ -65,6 +72,11 @@ const StatusRoute = StatusRouteImport.update({
   path: '/status',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReportScanIdRoute = ReportScanIdRouteImport.update({
+  id: '/report/$scanId',
+  path: '/report/$scanId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -75,12 +87,11 @@ const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
   path: '/app',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedReportScanIdRoute =
-  AuthenticatedReportScanIdRouteImport.update({
-    id: '/report/$scanId',
-    path: '/report/$scanId',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
+const ApiPublicBadgeRoute = ApiPublicBadgeRouteImport.update({
+  id: '/api/public/badge',
+  path: '/api/public/badge',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicVersionRoute = ApiPublicVersionRouteImport.update({
   id: '/api/public/version',
   path: '/api/public/version',
@@ -110,14 +121,16 @@ const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/guides': typeof GuidesRoute
   '/preorder': typeof PreorderRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/support': typeof SupportRoute
   '/status': typeof StatusRoute
+  '/report/$scanId': typeof ReportScanIdRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/app': typeof AuthenticatedAppRoute
-  '/report/$scanId': typeof AuthenticatedReportScanIdRoute
+  '/api/public/badge': typeof ApiPublicBadgeRoute
   '/api/public/version': typeof ApiPublicVersionRoute
   '/api/public/worker/claim': typeof ApiPublicWorkerClaimRoute
   '/api/public/worker/progress': typeof ApiPublicWorkerProgressRoute
@@ -127,14 +140,16 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/guides': typeof GuidesRoute
   '/preorder': typeof PreorderRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/support': typeof SupportRoute
   '/status': typeof StatusRoute
+  '/report/$scanId': typeof ReportScanIdRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/app': typeof AuthenticatedAppRoute
-  '/report/$scanId': typeof AuthenticatedReportScanIdRoute
+  '/api/public/badge': typeof ApiPublicBadgeRoute
   '/api/public/version': typeof ApiPublicVersionRoute
   '/api/public/worker/claim': typeof ApiPublicWorkerClaimRoute
   '/api/public/worker/progress': typeof ApiPublicWorkerProgressRoute
@@ -146,14 +161,16 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/guides': typeof GuidesRoute
   '/preorder': typeof PreorderRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/support': typeof SupportRoute
   '/status': typeof StatusRoute
+  '/report/$scanId': typeof ReportScanIdRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/app': typeof AuthenticatedAppRoute
-  '/_authenticated/report/$scanId': typeof AuthenticatedReportScanIdRoute
+  '/api/public/badge': typeof ApiPublicBadgeRoute
   '/api/public/version': typeof ApiPublicVersionRoute
   '/api/public/worker/claim': typeof ApiPublicWorkerClaimRoute
   '/api/public/worker/progress': typeof ApiPublicWorkerProgressRoute
@@ -165,14 +182,16 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/guides'
     | '/preorder'
     | '/privacy'
     | '/terms'
     | '/support'
     | '/status'
+    | '/report/$scanId'
     | '/admin'
     | '/app'
-    | '/report/$scanId'
+    | '/api/public/badge'
     | '/api/public/version'
     | '/api/public/worker/claim'
     | '/api/public/worker/progress'
@@ -182,14 +201,16 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/guides'
     | '/preorder'
     | '/privacy'
     | '/terms'
     | '/support'
     | '/status'
+    | '/report/$scanId'
     | '/admin'
     | '/app'
-    | '/report/$scanId'
+    | '/api/public/badge'
     | '/api/public/version'
     | '/api/public/worker/claim'
     | '/api/public/worker/progress'
@@ -200,14 +221,16 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/guides'
     | '/preorder'
     | '/privacy'
     | '/terms'
     | '/support'
     | '/status'
+    | '/report/$scanId'
     | '/_authenticated/admin'
     | '/_authenticated/app'
-    | '/_authenticated/report/$scanId'
+    | '/api/public/badge'
     | '/api/public/version'
     | '/api/public/worker/claim'
     | '/api/public/worker/progress'
@@ -219,11 +242,14 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  GuidesRoute: typeof GuidesRoute
   PreorderRoute: typeof PreorderRoute
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
   SupportRoute: typeof SupportRoute
   StatusRoute: typeof StatusRoute
+  ReportScanIdRoute: typeof ReportScanIdRoute
+  ApiPublicBadgeRoute: typeof ApiPublicBadgeRoute
   ApiPublicVersionRoute: typeof ApiPublicVersionRoute
   ApiPublicWorkerClaimRoute: typeof ApiPublicWorkerClaimRoute
   ApiPublicWorkerProgressRoute: typeof ApiPublicWorkerProgressRoute
@@ -252,6 +278,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guides': {
+      id: '/guides'
+      path: '/guides'
+      fullPath: '/guides'
+      preLoaderRoute: typeof GuidesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/preorder': {
@@ -289,6 +322,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StatusRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/report/$scanId': {
+      id: '/report/$scanId'
+      path: '/report/$scanId'
+      fullPath: '/report/$scanId'
+      preLoaderRoute: typeof ReportScanIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
       path: '/admin'
@@ -303,12 +343,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/report/$scanId': {
-      id: '/_authenticated/report/$scanId'
-      path: '/report/$scanId'
-      fullPath: '/report/$scanId'
-      preLoaderRoute: typeof AuthenticatedReportScanIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+    '/api/public/badge': {
+      id: '/api/public/badge'
+      path: '/api/public/badge'
+      fullPath: '/api/public/badge'
+      preLoaderRoute: typeof ApiPublicBadgeRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/public/version': {
       id: '/api/public/version'
@@ -351,13 +391,11 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedAppRoute: typeof AuthenticatedAppRoute
-  AuthenticatedReportScanIdRoute: typeof AuthenticatedReportScanIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedAppRoute: AuthenticatedAppRoute,
-  AuthenticatedReportScanIdRoute: AuthenticatedReportScanIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -367,11 +405,14 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  GuidesRoute: GuidesRoute,
   PreorderRoute: PreorderRoute,
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
   SupportRoute: SupportRoute,
   StatusRoute: StatusRoute,
+  ReportScanIdRoute: ReportScanIdRoute,
+  ApiPublicBadgeRoute: ApiPublicBadgeRoute,
   ApiPublicVersionRoute: ApiPublicVersionRoute,
   ApiPublicWorkerClaimRoute: ApiPublicWorkerClaimRoute,
   ApiPublicWorkerProgressRoute: ApiPublicWorkerProgressRoute,

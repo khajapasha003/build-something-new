@@ -2,9 +2,8 @@ User-agent: *
 Allow: /
 Disallow: /app
 Disallow: /api/
-Disallow: /report/
 
-Sitemap: https://prelaunchqa.com/sitemap/xml
+Sitemap: https://prelaunchqa.com/sitemap.xml
 
 User-agent: GPTBot
 Allow: /

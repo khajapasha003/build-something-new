@@ -10,8 +10,11 @@ export function SiteHeader() {
           <BrandLogo className="h-8 w-auto" />
         </Link>
         <nav className="flex items-center gap-5 text-sm text-muted-foreground">
+          <Link to="/guides" className="transition hover:text-foreground">
+            Guides
+          </Link>
           <Link to="/preorder" className="transition hover:text-foreground">
-            Pre-order
+            Pricing
           </Link>
           <Link to="/support" className="transition hover:text-foreground">
             Support
@@ -20,10 +23,10 @@ export function SiteHeader() {
             Sign in
           </Link>
           <Link
-            to="/preorder"
+            to="/auth"
             className="rounded-lg bg-primary px-4 py-2 font-medium text-primary-foreground transition hover:brightness-110"
           >
-            Get early access
+            Start free check
           </Link>
         </nav>
       </div>
@@ -43,7 +46,10 @@ export function SiteFooter() {
             Real browser checks before launch. Launch with proof.
           </span>
         </div>
-        <nav className="flex gap-5">
+        <nav className="flex flex-wrap gap-5">
+          <Link to="/guides" className="transition hover:text-foreground">
+            Guides
+          </Link>
           <Link to="/status" className="transition hover:text-foreground">
             Status
           </Link>

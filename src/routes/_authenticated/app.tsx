@@ -170,9 +170,19 @@ function Dashboard() {
 
   async function onRunCheck(app: AppRow) {
     setScanMessage(null);
+    if (!billing?.unlimitedScans && (billing?.scanCredits ?? 1) <= 0) {
+      setShowBilling(true);
+      return;
+    }
     const result = await startScan({ data: { appId: app.id } });
-    if (!result.ok) setScanMessage({ appId: app.id, text: result.error });
+    if (!result.ok) {
+      if (result.error.includes("NO_CREDITS")) {
+        setShowBilling(true);
+      }
+      setScanMessage({ appId: app.id, text: result.error });
+    }
     await queryClient.invalidateQueries({ queryKey: ["scans"] });
+    await queryClient.invalidateQueries({ queryKey: ["billing"] });
   }
 
   async function onAdd(event: React.FormEvent) {
@@ -244,6 +254,27 @@ function Dashboard() {
           Add the app you want checked, then prove you own it. Nothing is ever fetched from an app
           you have not verified.
         </p>
+
+        {!billing?.unlimitedScans && (billing?.scanCredits ?? 1) <= 0 && (
+          <div className="mt-6 flex flex-col gap-3 rounded-2xl border border-amber/40 bg-amber/10 p-5 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold text-amber">
+                You have used your free sample check credit.
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Upgrade to Launch Check ($49 for 5 deep checks + re-scan comparison) or Monthly
+                Re-test ($99/mo) to continue verifying your apps.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowBilling(true)}
+              className="shrink-0 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground transition hover:brightness-110"
+            >
+              Get More Checks →
+            </button>
+          </div>
+        )}
 
         <section className="mt-10 rounded-3xl border border-border bg-card p-6">
           <h2 className="text-lg">Add an app</h2>

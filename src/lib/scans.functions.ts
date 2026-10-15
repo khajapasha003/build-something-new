@@ -52,6 +52,26 @@ export const requestScan = createServerFn({ method: "POST" })
       return { ok: false, error: "Verify that you own this app before running a check." };
     }
 
+    // Verify credits & entitlements
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: creditsData } = await supabaseAdmin
+      .from("user_credits")
+      .select("plan, scan_credits, unlimited_scans")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+
+    const isUnlimited = Boolean(creditsData?.unlimited_scans);
+    // If no row exists yet, default to 1 free sample scan
+    const availableCredits = creditsData ? creditsData.scan_credits : 1;
+
+    if (!isUnlimited && availableCredits <= 0) {
+      return {
+        ok: false,
+        error:
+          "NO_CREDITS: You have used your check credits. Upgrade to Launch Check ($49) or Monthly Re-test ($99/mo) to run more checks.",
+      };
+    }
+
     const { data: row, error } = await context.supabase
       .from("scans")
       .insert({
@@ -71,7 +91,75 @@ export const requestScan = createServerFn({ method: "POST" })
       console.error("requestScan failed", error);
       return { ok: false, error: "We could not queue that check. Please try again." };
     }
+
+    // Deduct credit if not on an unlimited subscription
+    if (!isUnlimited) {
+      const remaining = Math.max(0, availableCredits - 1);
+      await supabaseAdmin.from("user_credits").upsert({
+        user_id: context.userId,
+        plan: creditsData?.plan ?? "sample",
+        scan_credits: remaining,
+        unlimited_scans: false,
+        updated_at: new Date().toISOString(),
+      });
+    }
+
     return { ok: true, scan: row as ScanRow };
+  });
+
+export type PublicScanSummary = {
+  id: string;
+  target_url: string;
+  status: ScanStatus;
+  bug_count: number;
+  needs_review_count: number;
+  passed_count: number;
+  created_at: string;
+  finished_at: string | null;
+  findings: Array<{
+    id: string;
+    rule_id: string;
+    severity: "bug" | "needs_review" | "passed";
+    title: string;
+    detail: string | null;
+    page_url: string | null;
+    evidence: string;
+  }>;
+};
+
+/** Publicly accessible scan summary for shareable verified reports and badges */
+export const getPublicScanSummary = createServerFn({ method: "GET" })
+  .inputValidator((input: unknown) => z.object({ scanId: z.string().uuid() }).parse(input))
+  .handler(async ({ data }): Promise<PublicScanSummary | null> => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: scan, error } = await supabaseAdmin
+      .from("scans")
+      .select(
+        "id, target_url, status, bug_count, needs_review_count, passed_count, created_at, finished_at",
+      )
+      .eq("id", data.scanId)
+      .maybeSingle();
+
+    if (error || !scan) return null;
+
+    const { data: findings } = await supabaseAdmin
+      .from("findings")
+      .select("id, rule_id, severity, title, detail, page_url, evidence")
+      .eq("scan_id", data.scanId)
+      .order("severity", { ascending: true })
+      .limit(100);
+
+    return {
+      id: scan.id,
+      target_url: scan.target_url,
+      status: scan.status as ScanStatus,
+      bug_count: scan.bug_count,
+      needs_review_count: scan.needs_review_count,
+      passed_count: scan.passed_count,
+      created_at: scan.created_at,
+      finished_at: scan.finished_at,
+      findings: (findings ?? []) as PublicScanSummary["findings"],
+    };
   });
 
 export const cancelScan = createServerFn({ method: "POST" })

@@ -49,5 +49,12 @@
   - [x] Landing page: trust/credibility section (ownership verified, no code access, evidence-based)
   - [x] Landing page: hero updated for live product with AI tools messaging
   - [x] Landing page: pricing tiles connected to live billing plans ($0/$49/$99)
-  - [x] Preorder page: converted from waitlist form to live pricing with direct sign-in CTAs
-
+- [x] Phase 7 — Revenue enforcement, viral badges, public reports & AI builder guides
+  - [x] Credit gate in `requestScan`: enforces credit limits, auto-decrements balance, and gates unpaid checks
+  - [x] Dashboard zero-credit alert banner & auto-modal trigger when balance reaches 0
+  - [x] Public SVG badge generator at `/api/public/badge`: dynamic two-tone status badge for verified apps
+  - [x] Shareable badge embed card with 1-click Markdown and HTML snippets for README and website footers
+  - [x] Unified public report viewer at `/report/$scanId`: session-aware view, raw evidence expanders, and viral conversion CTA
+  - [x] AI Web App QA Guides at `/guides`: dedicated playbooks for Lovable, Bolt.new, Cursor, and v0 apps
+  - [x] Static high-priority `public/sitemap.xml` and refined `public/robots.txt`
+  - [x] Clean TanStack Router registration in `routeTree.gen.ts`
