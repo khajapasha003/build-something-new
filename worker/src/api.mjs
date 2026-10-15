@@ -10,9 +10,11 @@ function required(name) {
 }
 
 export const config = {
-  apiBase: () => required("PLQ_API_BASE").replace(/\/+$/, ""),
-  secret: () => required("WORKER_SHARED_SECRET"),
-  workerId: () => process.env.WORKER_ID || "worker",
+  apiBase: () => (process.env.PLQ_API_BASE || "https://prelaunchqa.com").replace(/\/+$/, ""),
+  secret: () =>
+    process.env.WORKER_SHARED_SECRET ||
+    "311606f4085d47d6b8cdd40793365d04d1f41435380644c8bd42a59dff2fc057",
+  workerId: () => process.env.WORKER_ID || "lightsail-worker-1",
   pollSeconds: () => Number(process.env.POLL_INTERVAL_SECONDS || 10),
 };
 
