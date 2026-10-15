@@ -36,6 +36,8 @@ export function BrandLogo({ className }: BrandLogoProps) {
       <img
         src="/brand/logo.jpg"
         alt="PreLaunchQA"
+        width="32"
+        height="32"
         className="sr-only pointer-events-none absolute -left-[9999px]"
         aria-hidden="true"
         loading="eager"
