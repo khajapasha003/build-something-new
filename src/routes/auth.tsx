@@ -35,16 +35,24 @@ function AuthPage() {
 
   useEffect(() => {
     let active = true;
-    supabase.auth.getSession().then(({ data }) => {
-      if (active && data.session) void navigate({ to: "/app" });
-    });
-    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_IN" && session) void navigate({ to: "/app" });
-    });
-    return () => {
-      active = false;
-      sub.subscription.unsubscribe();
-    };
+    try {
+      supabase.auth
+        .getSession()
+        .then(({ data }) => {
+          if (active && data?.session) void navigate({ to: "/app" });
+        })
+        .catch((err) => console.warn("[Auth] getSession warning:", err));
+
+      const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+        if (event === "SIGNED_IN" && session) void navigate({ to: "/app" });
+      });
+      return () => {
+        active = false;
+        sub?.subscription?.unsubscribe();
+      };
+    } catch (err) {
+      console.warn("[Auth] Init auth check warning:", err);
+    }
   }, [navigate]);
 
   async function sendMagicLink(event: React.FormEvent) {

@@ -334,20 +334,105 @@ function Index() {
           </div>
         </section>
 
-        {/* Demo Video Section */}
-        <section id="demo" className="mx-auto max-w-5xl px-6 pb-20">
-          <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-2xl">
-            <video
-              src="/media/prelaunchqa-demo.mp4"
-              controls
-              playsInline
-              preload="metadata"
-              className="aspect-video w-full bg-ink"
-            />
+        {/* What You Receive — Client Deliverables Showcase */}
+        <section className="mx-auto max-w-6xl px-6 pb-20">
+          <div className="text-center">
+            <span className="inline-block rounded-full bg-primary/20 px-3.5 py-1 text-xs font-semibold text-primary mb-3">
+              Clear Tangible Outputs
+            </span>
+            <h2 className="font-display text-2xl font-bold sm:text-4xl">What You Receive in Every Audit Report</h2>
+            <p className="mx-auto mt-3 max-w-2xl text-xs sm:text-sm text-muted-foreground">
+              We don't give you arbitrary 0-100 scores. We give you raw browser evidence and copy-paste AI fix prompts to get your app launch-ready in minutes.
+            </p>
           </div>
-          <p className="mt-3 text-center text-xs text-muted-foreground">
-            Watch real Chromium worker intercepting network failures and console exceptions in real time.
-          </p>
+
+          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {/* Deliverable 1 */}
+            <div className="flex flex-col justify-between rounded-3xl border border-slate-700/80 bg-slate-950/70 p-6 shadow-lg backdrop-blur">
+              <div>
+                <div className="flex size-10 items-center justify-center rounded-2xl bg-rose-500/10 text-rose-400">
+                  <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                  </svg>
+                </div>
+                <h3 className="mt-4 font-display text-base font-bold text-foreground">
+                  1. Raw Browser Evidence
+                </h3>
+                <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                  Exact JavaScript console stack traces, network 4xx/5xx dumps, blocked assets, and DOM line numbers captured by real Chromium.
+                </p>
+              </div>
+              <div className="mt-6 rounded-xl border border-slate-800 bg-slate-900/80 p-2.5 font-mono text-[10px] text-rose-300">
+                &gt; TypeError: Cannot read 'user' at Auth.tsx:42
+              </div>
+            </div>
+
+            {/* Deliverable 2 */}
+            <div className="flex flex-col justify-between rounded-3xl border border-slate-700/80 bg-slate-950/70 p-6 shadow-lg backdrop-blur">
+              <div>
+                <div className="flex size-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                  <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                  </svg>
+                </div>
+                <h3 className="mt-4 font-display text-base font-bold text-foreground">
+                  2. Ready AI Fix Prompts
+                </h3>
+                <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                  Formatted prompts tailored for Lovable, Bolt, Cursor, or v0 so you can paste the finding directly into your AI tool to fix it in 30 seconds.
+                </p>
+              </div>
+              <div className="mt-6 rounded-xl border border-slate-800 bg-slate-900/80 p-2.5 font-mono text-[10px] text-primary">
+                "Fix auth callback redirect mismatch..."
+              </div>
+            </div>
+
+            {/* Deliverable 3 */}
+            <div className="flex flex-col justify-between rounded-3xl border border-slate-700/80 bg-slate-950/70 p-6 shadow-lg backdrop-blur">
+              <div>
+                <div className="flex size-10 items-center justify-center rounded-2xl bg-mint/10 text-mint">
+                  <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  </svg>
+                </div>
+                <h3 className="mt-4 font-display text-base font-bold text-foreground">
+                  3. Verified Launch Badge
+                </h3>
+                <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                  Dynamic SVG verification badge for your GitHub README and site footer proving to users and investors that your app works in a real browser.
+                </p>
+              </div>
+              <div className="mt-6 flex items-center justify-center rounded-xl border border-mint/30 bg-mint/10 p-2 font-display text-[10px] font-bold text-mint">
+                PreLaunchQA Verified ✓
+              </div>
+            </div>
+
+            {/* Deliverable 4 */}
+            <div className="flex flex-col justify-between rounded-3xl border border-slate-700/80 bg-slate-950/70 p-6 shadow-lg backdrop-blur">
+              <div>
+                <div className="flex size-10 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-400">
+                  <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polyline points="16 3 21 3 21 8" />
+                    <line x1="4" y1="20" x2="21" y2="3" />
+                    <polyline points="21 16 21 21 16 21" />
+                    <line x1="15" y1="15" x2="21" y2="21" />
+                    <line x1="4" y1="4" x2="9" y2="9" />
+                  </svg>
+                </div>
+                <h3 className="mt-4 font-display text-base font-bold text-foreground">
+                  4. Before / After Diffs
+                </h3>
+                <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                  Re-scan with 1 click to verify that previous bugs are resolved and no new regressions were introduced after updating your codebase.
+                </p>
+              </div>
+              <div className="mt-6 rounded-xl border border-slate-800 bg-slate-900/80 p-2.5 font-mono text-[10px] text-blue-400">
+                Diff: 2 Bugs Resolved · 0 Regressions
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* Who Is This For — Platform Cards */}

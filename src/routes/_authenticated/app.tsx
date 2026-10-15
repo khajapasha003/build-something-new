@@ -174,11 +174,13 @@ function Dashboard() {
   const totalCheckPoints = totalBugsCaught + totalPassedChecks;
   const cleanPassRate = totalCheckPoints > 0 ? Math.round((totalPassedChecks / totalCheckPoints) * 100) : 100;
 
+  const [paymentProvider, setPaymentProvider] = useState<"stripe" | "paypal" | "razorpay">("stripe");
+
   async function onUpgrade(planId: "launch" | "retest") {
     setCheckingOut(planId);
     setCheckoutError(null);
     try {
-      const res = await checkoutFn({ data: { planId } });
+      const res = await checkoutFn({ data: { planId, provider: paymentProvider } });
       if (res.ok) {
         if (res.url.startsWith("http")) {
           window.location.href = res.url;
@@ -845,6 +847,35 @@ function Dashboard() {
                   {checkoutError}
                 </div>
               )}
+
+              {/* Payment Gateway Selector */}
+              <div className="mt-5 rounded-2xl border border-border/80 bg-background/60 p-4">
+                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Select Payment Method
+                </p>
+                <div className="mt-2.5 grid grid-cols-3 gap-2.5">
+                  {[
+                    { id: "stripe", label: "Credit Card", icon: "💳", sub: "Global Cards" },
+                    { id: "paypal", label: "PayPal", icon: "🅿️", sub: "International" },
+                    { id: "razorpay", label: "Razorpay", icon: "⚡", sub: "UPI / Netbanking" },
+                  ].map((p) => (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => setPaymentProvider(p.id as any)}
+                      className={`flex flex-col items-center justify-center rounded-xl border p-2 text-center transition ${
+                        paymentProvider === p.id
+                          ? "border-primary bg-primary/10 shadow-sm shadow-primary/20 text-foreground"
+                          : "border-border/80 bg-card/60 text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      <span className="text-base">{p.icon}</span>
+                      <span className="mt-1 font-display text-xs font-bold">{p.label}</span>
+                      <span className="text-[10px] text-muted-foreground">{p.sub}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
 
               <div className="mt-6 grid gap-4 sm:grid-cols-2">
                 {/* Launch Check Pack */}

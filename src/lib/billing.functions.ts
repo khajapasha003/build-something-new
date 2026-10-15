@@ -131,12 +131,19 @@ export const getBillingOverview = createServerFn({ method: "GET" })
 
 const checkoutInputSchema = z.object({
   planId: z.enum(["launch", "retest"]),
+  provider: z.enum(["stripe", "paypal", "razorpay"]).optional().default("stripe"),
   successUrl: z.string().optional(),
   cancelUrl: z.string().optional(),
 });
 
 export type CreateCheckoutResult =
-  | { ok: true; url: string; mode: "stripe" | "test" }
+  | {
+      ok: true;
+      url: string;
+      mode: "stripe" | "paypal" | "razorpay" | "test";
+      orderId?: string;
+      razorpayKeyId?: string;
+    }
   | { ok: false; error: string };
 
 export const createCheckoutSession = createServerFn({ method: "POST" })
@@ -148,14 +155,149 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       return { ok: false, error: "Invalid plan selected." };
     }
 
-    const stripeKey = process.env.STRIPE_SECRET_KEY;
     const appOrigin = process.env.APP_ORIGIN || "https://prelaunchqa.com";
-
     const successUrl = data.successUrl || `${appOrigin}/app?checkout=success&plan=${data.planId}`;
     const cancelUrl = data.cancelUrl || `${appOrigin}/app?checkout=cancelled`;
 
-    // 1. If live or test Stripe key is provided, create a real Stripe Checkout Session
-    if (stripeKey && stripeKey.trim().length > 0) {
+    // 1. PayPal Checkout Support
+    const paypalClientId = process.env.PAYPAL_CLIENT_ID;
+    const paypalClientSecret = process.env.PAYPAL_CLIENT_SECRET;
+    const isPaypalLive = process.env.PAYPAL_ENV !== "sandbox";
+    const paypalApiBase = isPaypalLive
+      ? "https://api-m.paypal.com"
+      : "https://api-m.sandbox.paypal.com";
+
+    if (data.provider === "paypal" && paypalClientId && paypalClientSecret) {
+      try {
+        const authHeader = btoa(`${paypalClientId}:${paypalClientSecret}`);
+        const tokenRes = await fetch(`${paypalApiBase}/v1/oauth2/token`, {
+          method: "POST",
+          headers: {
+            Authorization: `Basic ${authHeader}`,
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: "grant_type=client_credentials",
+        });
+
+        if (!tokenRes.ok) {
+          throw new Error("Failed to authenticate with PayPal API");
+        }
+
+        const tokenData = (await tokenRes.json()) as { access_token: string };
+        const orderRes = await fetch(`${paypalApiBase}/v2/checkout/orders`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${tokenData.access_token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            intent: "CAPTURE",
+            purchase_units: [
+              {
+                reference_id: `${context.userId}_${data.planId}_${Date.now()}`,
+                description: `PreLaunchQA - ${selectedPlan.name}`,
+                amount: {
+                  currency_code: "USD",
+                  value: (selectedPlan.price / 100).toFixed(2),
+                },
+              },
+            ],
+            application_context: {
+              return_url: `${successUrl}&gateway=paypal`,
+              cancel_url: cancelUrl,
+              brand_name: "PreLaunchQA",
+              user_action: "PAY_NOW",
+            },
+          }),
+        });
+
+        if (!orderRes.ok) {
+          const errBody = await orderRes.text();
+          console.error("[PayPal] Order creation error:", errBody);
+          return { ok: false, error: "PayPal order initialization failed. Please try again." };
+        }
+
+        const orderData = (await orderRes.json()) as {
+          id: string;
+          links: Array<{ rel: string; href: string }>;
+        };
+        const approveLink = orderData.links.find((l) => l.rel === "approve");
+
+        await context.supabase.from("orders").insert({
+          user_id: context.userId,
+          stripe_session_id: `paypal_${orderData.id}`,
+          plan: data.planId,
+          amount: selectedPlan.price,
+          currency: "usd",
+          status: "pending",
+        });
+
+        if (approveLink?.href) {
+          return { ok: true, url: approveLink.href, mode: "paypal", orderId: orderData.id };
+        }
+      } catch (err: any) {
+        console.error("[PayPal] Error:", err);
+        return { ok: false, error: err.message || "Failed to initiate PayPal payment." };
+      }
+    }
+
+    // 2. Razorpay Checkout Support
+    const razorpayKeyId = process.env.RAZORPAY_KEY_ID;
+    const razorpayKeySecret = process.env.RAZORPAY_KEY_SECRET;
+
+    if (data.provider === "razorpay" && razorpayKeyId && razorpayKeySecret) {
+      try {
+        const authHeader = btoa(`${razorpayKeyId}:${razorpayKeySecret}`);
+        const rzpRes = await fetch("https://api.razorpay.com/v1/orders", {
+          method: "POST",
+          headers: {
+            Authorization: `Basic ${authHeader}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            amount: selectedPlan.price, // in cents/paise
+            currency: "USD",
+            receipt: `rcpt_${Date.now()}`,
+            notes: {
+              userId: context.userId,
+              planId: data.planId,
+            },
+          }),
+        });
+
+        if (!rzpRes.ok) {
+          const errBody = await rzpRes.text();
+          console.error("[Razorpay] Order creation error:", errBody);
+          return { ok: false, error: "Razorpay order creation failed. Please try again." };
+        }
+
+        const rzpOrder = (await rzpRes.json()) as { id: string };
+
+        await context.supabase.from("orders").insert({
+          user_id: context.userId,
+          stripe_session_id: `rzp_${rzpOrder.id}`,
+          plan: data.planId,
+          amount: selectedPlan.price,
+          currency: "usd",
+          status: "pending",
+        });
+
+        return {
+          ok: true,
+          url: `${successUrl}&gateway=razorpay&orderId=${rzpOrder.id}`,
+          mode: "razorpay",
+          orderId: rzpOrder.id,
+          razorpayKeyId,
+        };
+      } catch (err: any) {
+        console.error("[Razorpay] Error:", err);
+        return { ok: false, error: err.message || "Failed to initiate Razorpay checkout." };
+      }
+    }
+
+    // 3. Stripe Checkout Session Support
+    const stripeKey = process.env.STRIPE_SECRET_KEY;
+    if (data.provider === "stripe" && stripeKey && stripeKey.trim().length > 0) {
       try {
         const isSubscription = selectedPlan.type === "subscription";
         const bodyParams = new URLSearchParams();
@@ -202,7 +344,6 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
 
         const stripeSession = (await stripeRes.json()) as { id: string; url: string };
 
-        // Record pending order
         await context.supabase.from("orders").insert({
           user_id: context.userId,
           stripe_session_id: stripeSession.id,

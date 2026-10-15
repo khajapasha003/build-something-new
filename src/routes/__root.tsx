@@ -261,10 +261,28 @@ const structuredData = [
 ];
 
 function RootShell({ children }: { children: ReactNode }) {
+  const proc = typeof process !== "undefined" ? process.env : undefined;
+  const supaUrl =
+    proc?.["SUPABASE_URL"] ||
+    proc?.["VITE_SUPABASE_URL"] ||
+    "https://vdhhysfvuxmqtgdtvnez.supabase.co";
+  const supaKey =
+    proc?.["SUPABASE_PUBLISHABLE_KEY"] ||
+    proc?.["VITE_SUPABASE_PUBLISHABLE_KEY"] ||
+    "";
+
   return (
     <html lang="en">
       <head>
         <HeadContent />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.__ENV__ = {
+              VITE_SUPABASE_URL: ${JSON.stringify(supaUrl)},
+              VITE_SUPABASE_PUBLISHABLE_KEY: ${JSON.stringify(supaKey)}
+            };`,
+          }}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
