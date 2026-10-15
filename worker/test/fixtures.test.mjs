@@ -14,7 +14,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, "../..");
 const runLocalPath = path.resolve(__dirname, "../src/run-local.mjs");
-const runsBaseDir = path.resolve(repoRoot, "../plqa-reports/phase-A-runs");
+const runsBaseDir =
+  process.env.PLQA_REPORTS_DIR ||
+  (process.platform === "win32"
+    ? path.resolve(repoRoot, "../plqa-reports/phase-A-runs")
+    : "/tmp/plqa-reports/phase-A-runs");
 
 function runLocal(url, outDir) {
   return new Promise((resolve) => {
@@ -23,6 +27,9 @@ function runLocal(url, outDir) {
       [runLocalPath, url, "--out", outDir],
       { encoding: "utf8" },
       (error, stdout, stderr) => {
+        if (error && error.code !== 0) {
+          console.error(`[runLocal failed for ${url}]:`, stderr || stdout || error.message);
+        }
         resolve({
           status: error ? (error.code ?? 1) : 0,
           stdout,
@@ -43,6 +50,7 @@ describe("Phase A: Known-Answer Fixture Harness & Evidence Contract", () => {
   let servers;
 
   before(async () => {
+    fs.mkdirSync(runsBaseDir, { recursive: true });
     servers = await startServers();
   });
 

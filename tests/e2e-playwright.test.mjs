@@ -40,7 +40,10 @@ function assertCheck(name, condition, detail = "") {
 }
 
 if (chromium) {
-  const browser = await chromium.launch({ headless: true });
+  const browser = await chromium.launch({
+    headless: true,
+    args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"],
+  });
   try {
     const context = await browser.newContext({
       viewport: { width: 1440, height: 900 },
@@ -49,35 +52,50 @@ if (chromium) {
 
     // TEST 1: Homepage
     console.log(`[Test 1] Playwright Auditing Homepage: ${baseUrl}/`);
-    const homeRes = await page.goto(`${baseUrl}/`, { waitUntil: "networkidle", timeout: 30000 });
-    assertCheck("Homepage returns HTTP 200", homeRes.status() === 200);
+    try {
+      const homeRes = await page.goto(`${baseUrl}/`, { waitUntil: "domcontentloaded", timeout: 15000 });
+      assertCheck("Homepage returns HTTP 200", homeRes ? homeRes.status() === 200 : false);
 
-    const logoText = await page.locator("text=PreLaunch").first().isVisible();
-    assertCheck("PreLaunch wordmark is visible", logoText);
+      await page.waitForSelector("text=PreLaunch", { timeout: 5000 }).catch(() => {});
+      const logoText = await page.locator("text=PreLaunch").first().isVisible().catch(() => false);
+      assertCheck("PreLaunch wordmark is visible", logoText);
 
-    const qaBadge = await page.locator("text=QA").first().isVisible();
-    assertCheck("QA pill badge is visible", qaBadge);
+      const qaBadge = await page.locator("text=QA").first().isVisible().catch(() => false);
+      assertCheck("QA pill badge is visible", qaBadge);
 
-    const demoVideo = await page.locator("video, #demo").count();
-    assertCheck("Old demo video is removed from DOM", demoVideo === 0);
+      const demoVideo = await page.locator("video, #demo").count();
+      assertCheck("Old demo video is removed from DOM", demoVideo === 0);
+    } catch (err) {
+      assertCheck("Homepage load succeeded without timeout", false, err.message);
+    }
 
     // TEST 2: Auth Page
     console.log(`\n[Test 2] Playwright Auditing Auth Page: ${baseUrl}/auth`);
-    const authRes = await page.goto(`${baseUrl}/auth`, { waitUntil: "networkidle", timeout: 30000 });
-    assertCheck("Auth page returns HTTP 200", authRes.status() === 200);
+    try {
+      const authRes = await page.goto(`${baseUrl}/auth`, { waitUntil: "domcontentloaded", timeout: 15000 });
+      assertCheck("Auth page returns HTTP 200", authRes ? authRes.status() === 200 : false);
 
-    const hasCrash = await page.locator("text=This page didn't load").count();
-    assertCheck("Auth page does NOT crash into error boundary", hasCrash === 0);
+      await page.waitForTimeout(1000);
+      const hasCrash = await page.locator("text=This page didn't load").count();
+      assertCheck("Auth page does NOT crash into error boundary", hasCrash === 0);
+    } catch (err) {
+      assertCheck("Auth page load succeeded without timeout", false, err.message);
+    }
 
     // TEST 3: Preorder Page
     console.log(`\n[Test 3] Playwright Auditing Preorder Page: ${baseUrl}/preorder`);
-    const preorderRes = await page.goto(`${baseUrl}/preorder`, { waitUntil: "networkidle", timeout: 30000 });
-    assertCheck("Preorder page returns HTTP 200", preorderRes.status() === 200);
+    try {
+      const preorderRes = await page.goto(`${baseUrl}/preorder`, { waitUntil: "domcontentloaded", timeout: 15000 });
+      assertCheck("Preorder page returns HTTP 200", preorderRes ? preorderRes.status() === 200 : false);
 
-    const launchPack = await page.locator("text=Launch Check").first().isVisible();
-    assertCheck("Launch Check tier ($49) displayed", launchPack);
+      await page.waitForSelector("text=Launch Check", { timeout: 5000 }).catch(() => {});
+      const launchPack = await page.locator("text=Launch Check").first().isVisible().catch(() => false);
+      assertCheck("Launch Check tier ($49) displayed", launchPack);
+    } catch (err) {
+      assertCheck("Preorder page load succeeded without timeout", false, err.message);
+    }
   } finally {
-    await browser.close();
+    await browser.close().catch(() => {});
   }
 } else {
   // HTTP DOM Auditor Mode (When running outside Lightsail without Playwright binary)

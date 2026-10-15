@@ -50,9 +50,14 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, "../..");
 
+const defaultOutBase =
+  process.env.PLQA_REPORTS_DIR ||
+  (process.platform === "win32"
+    ? path.resolve(repoRoot, "../plqa-reports/phase-A-runs")
+    : "/tmp/plqa-reports/phase-A-runs");
+
 const defaultOut = path.resolve(
-  repoRoot,
-  "../plqa-reports/phase-A-runs",
+  defaultOutBase,
   new Date().toISOString().replace(/[:.]/g, "-"),
 );
 const resolvedOut = outDir ? path.resolve(process.cwd(), outDir) : defaultOut;
