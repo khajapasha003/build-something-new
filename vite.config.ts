@@ -87,7 +87,7 @@ export default defineConfig(({ command, mode }) => {
       }),
       command === "build" &&
         nitro({
-          defaultPreset: "cloudflare-module",
+          defaultPreset: (process.env.NITRO_PRESET || "node-server") as any,
           compatibilityDate: "2026-09-25" as const,
           replace: {
             "process.env.APP_VERSION_COMMIT": JSON.stringify(buildVersion!.commit),
