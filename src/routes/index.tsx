@@ -89,14 +89,13 @@ function Index() {
           <div className="relative mx-auto max-w-6xl px-6 pb-16 pt-20 sm:pt-28">
             <p className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1 text-xs text-muted-foreground">
               <span className="size-1.5 rounded-full bg-mint" />
-              In development — pre-orders open
+              Now live — free sample check available
             </p>
             <h1 className="mt-6 max-w-4xl text-4xl leading-[1.05] sm:text-6xl">
               Your AI-built web app, checked in a real browser before launch.
             </h1>
             <p className="mt-6 max-w-2xl text-lg text-muted-foreground">
-              Every bug comes back with raw browser evidence. No scores, no badges, no claims we
-              cannot show you the evidence for.
+              Console errors, broken links, failed requests — every bug found in a real Chromium browser, backed by raw evidence. Built specifically for apps created with Lovable, Bolt, Cursor, and other AI tools.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
@@ -140,6 +139,78 @@ function Index() {
           <p className="mt-3 text-sm text-muted-foreground">
             A recording of the product as it stands today. It is not a finished release.
           </p>
+        </section>
+
+        <section className="mx-auto max-w-6xl px-6 pb-20">
+          <h2 className="text-2xl sm:text-3xl">Built for builders who ship fast</h2>
+          <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
+            If you build with AI tools, your code moves faster than you can manually verify.
+            PreLaunchQA catches what slips through.
+          </p>
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              {
+                tool: "Lovable",
+                desc: "Full-stack apps generated from prompts. Catch runtime errors before your users do.",
+              },
+              {
+                tool: "Bolt",
+                desc: "Rapid prototypes that need production-grade verification before going live.",
+              },
+              {
+                tool: "Cursor",
+                desc: "AI-assisted code that compiles but might break in the browser.",
+              },
+              {
+                tool: "v0 & Others",
+                desc: "Any AI-generated frontend that needs a real-browser sanity check.",
+              },
+            ].map((item) => (
+              <div
+                key={item.tool}
+                className="rounded-2xl border border-border bg-card p-5"
+              >
+                <h3 className="font-display text-sm font-semibold text-primary">
+                  {item.tool}
+                </h3>
+                <p className="mt-2 text-sm text-muted-foreground">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="mx-auto max-w-6xl px-6 pb-20">
+          <h2 className="text-2xl sm:text-3xl">Why not just test it yourself?</h2>
+          <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
+            You can. But here is what that usually looks like versus what PreLaunchQA does.
+          </p>
+          <div className="mt-8 overflow-hidden rounded-2xl border border-border">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border bg-card">
+                  <th className="px-4 py-3 text-left font-medium text-muted-foreground">Check</th>
+                  <th className="px-4 py-3 text-left font-medium text-coral">Manual</th>
+                  <th className="px-4 py-3 text-left font-medium text-mint">PreLaunchQA</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {[
+                  ["Console errors", "Open DevTools, scroll through logs", "Automatic — every error captured with stack trace"],
+                  ["Broken links", "Click each link one by one", "Every link on the page tested in seconds"],
+                  ["Missing alt text", "Inspect each image element", "All images flagged with evidence"],
+                  ["Network failures", "Watch the Network tab while navigating", "Every failed request logged automatically"],
+                  ["Mixed content", "Check Security tab for warnings", "All http:// resources on https:// pages flagged"],
+                  ["After a code change", "Repeat everything from scratch", "One click re-scan with before/after diff"],
+                ].map(([check, manual, auto]) => (
+                  <tr key={check} className="bg-background">
+                    <td className="px-4 py-3 font-medium text-foreground">{check}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{manual}</td>
+                    <td className="px-4 py-3 text-foreground">{auto}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
 
         <section className="mx-auto max-w-6xl px-6 pb-20">
@@ -203,6 +274,39 @@ function Index() {
               sent, and deciding refunds. Anything else would put you on the wrong side of
               permission rules.
             </p>
+          </div>
+        </section>
+
+        <section className="mx-auto max-w-6xl px-6 pb-20">
+          <div className="grid gap-4 sm:grid-cols-3">
+            {[
+              {
+                icon: "🔒",
+                title: "Ownership verified",
+                desc: "We verify you own the domain before any check runs. DNS record, meta tag, or file — your choice.",
+              },
+              {
+                icon: "🛡️",
+                title: "No code access needed",
+                desc: "We only need your URL. We never access your source code, database, or deployment pipeline.",
+              },
+              {
+                icon: "📋",
+                title: "Evidence, not opinions",
+                desc: "Every finding includes the raw browser data that produced it. Verify for yourself — nothing is hidden.",
+              },
+            ].map((item) => (
+              <div
+                key={item.title}
+                className="rounded-2xl border border-border bg-card p-6 text-center"
+              >
+                <span className="text-3xl">{item.icon}</span>
+                <h3 className="mt-3 text-base font-semibold text-foreground">
+                  {item.title}
+                </h3>
+                <p className="mt-2 text-sm text-muted-foreground">{item.desc}</p>
+              </div>
+            ))}
           </div>
         </section>
 

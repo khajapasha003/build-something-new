@@ -93,6 +93,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:image", content: "https://prelaunchqa.com/brand/og-image.png" },
     ],
     links: [
+      { rel: "canonical", href: "https://prelaunchqa.com" },
       {
         rel: "stylesheet",
         href: appCss,
@@ -114,11 +115,151 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   errorComponent: ErrorComponent,
 });
 
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "PreLaunchQA",
+    "url": "https://prelaunchqa.com",
+    "logo": "https://prelaunchqa.com/brand/logo.png",
+    "description":
+      "Automated real-browser testing for AI-built web apps. Console errors, broken links, accessibility gaps — each finding backed by raw browser evidence.",
+    "sameAs": [],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "PreLaunchQA",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Web",
+    "url": "https://prelaunchqa.com",
+    "description":
+      "Real-browser checks for AI-built web apps: console errors, broken links, accessibility, and raw evidence for every finding.",
+    "offers": [
+      {
+        "@type": "Offer",
+        "name": "Sample Scan",
+        "price": "0",
+        "priceCurrency": "USD",
+        "description": "Free single-page check with raw browser evidence.",
+      },
+      {
+        "@type": "Offer",
+        "name": "Launch Check",
+        "price": "49",
+        "priceCurrency": "USD",
+        "description":
+          "Deep pre-launch audit: multi-page crawl, interactive flows, full evidence bundle.",
+      },
+      {
+        "@type": "Offer",
+        "name": "Monthly Re-test",
+        "price": "99",
+        "priceCurrency": "USD",
+        "description":
+          "Unlimited automated checks with before/after deploy comparison diffs.",
+      },
+    ],
+    "featureList": [
+      "Real Chromium browser testing",
+      "Console error detection",
+      "Broken link discovery",
+      "Accessibility gap detection",
+      "Raw browser evidence for every finding",
+      "Before/after re-scan comparison",
+      "Domain ownership verification",
+      "HMAC-signed secure worker API",
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What does PreLaunchQA check?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text":
+            "PreLaunchQA loads your web app in a real Chromium browser and checks for console errors, failed network requests, broken links, missing meta tags, images without alt text, form fields without labels, mixed content issues, and more. Every finding includes raw browser evidence.",
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "Who is PreLaunchQA for?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text":
+            "PreLaunchQA is built for developers using AI coding tools like Lovable, Bolt, Cursor, and v0 who want to verify their AI-generated web apps actually work in a real browser before going live.",
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "How is PreLaunchQA different from Lighthouse or PageSpeed?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text":
+            "PreLaunchQA focuses on functional correctness — real browser console errors, network failures, and dead links — rather than performance scores. It verifies domain ownership before scanning, provides before/after comparison diffs, and targets the specific issues AI-generated code produces.",
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "Is PreLaunchQA free?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text":
+            "Yes, the Sample Scan is free and gives you a single-page check with full raw browser evidence. For deeper audits, the Launch Check is $49 one-time and the Monthly Re-test plan is $99/month for unlimited checks.",
+        },
+      },
+      {
+        "@type": "Question",
+        "name": "Do I need to give PreLaunchQA access to my code?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text":
+            "No. PreLaunchQA only needs the URL of your live or staging site. It loads the page in a browser just like a real user would. You verify domain ownership via DNS record, meta tag, or file upload before any check runs.",
+        },
+      },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "How to check your AI-built web app with PreLaunchQA",
+    "description":
+      "Three simple steps to get a comprehensive browser-based quality check on your web application.",
+    "step": [
+      {
+        "@type": "HowToStep",
+        "name": "Verify you own the app",
+        "text":
+          "Add a DNS record, meta tag, or verification file to prove you own the domain. Nothing is checked until ownership is confirmed.",
+      },
+      {
+        "@type": "HowToStep",
+        "name": "We inspect your page",
+        "text":
+          "A real Chromium browser loads your app and records console errors, failed network calls, dead links, and DOM hygiene issues.",
+      },
+      {
+        "@type": "HowToStep",
+        "name": "You get evidence",
+        "text":
+          "Each finding carries raw JSON evidence from the browser session, plus automatic before/after diffs when you re-scan.",
+      },
+    ],
+  },
+];
+
 function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
         <HeadContent />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
       </head>
       <body>
         {children}

@@ -34,3 +34,20 @@
   - [x] Database migration: `support_tickets` table with RLS policies
   - [x] Navigation: added Support and Status links to SiteHeader and SiteFooter
   - [x] Finalized legal text: complete Terms of Service (liability, refund guarantee, acceptable use) and Privacy Policy (Stripe processing, GDPR/DPDP, data retention)
+- [x] Brand upgrade — high-contrast vector logo across all routes
+  - [x] New SVG vector logo with pure white text (#FFFFFF) and mint green QA badge (#10B981)
+  - [x] 4x supersampled PNG, JPEG, favicon, apple-touch-icon, OG image, email header assets
+  - [x] `<picture>` element with SVG/PNG/JPG fallback for smoke test compatibility
+  - [x] Updated across all routes: header, footer, auth, report, admin, favicon, OG meta
+- [x] Phase 6 — SEO, AEO & marketing engine
+  - [x] `robots.txt` with AI crawler allow rules (GPTBot, ClaudeBot, PerplexityBot, etc.)
+  - [x] Dynamic `/sitemap/xml` API route with all public pages, priorities, and changefreq
+  - [x] JSON-LD structured data: Organization, SoftwareApplication, FAQPage, HowTo schemas
+  - [x] Canonical URL in root layout head
+  - [x] Landing page: "Built for builders" section targeting Lovable/Bolt/Cursor/v0 users
+  - [x] Landing page: "Why not test yourself?" comparison table (Manual vs PreLaunchQA)
+  - [x] Landing page: trust/credibility section (ownership verified, no code access, evidence-based)
+  - [x] Landing page: hero updated for live product with AI tools messaging
+  - [x] Landing page: pricing tiles connected to live billing plans ($0/$49/$99)
+  - [x] Preorder page: converted from waitlist form to live pricing with direct sign-in CTAs
+
