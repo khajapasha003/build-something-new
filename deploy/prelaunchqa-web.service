@@ -14,6 +14,7 @@ Environment=SUPABASE_PUBLISHABLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3
 Environment=APP_ORIGIN=https://prelaunchqa.com
 Environment=WORKER_SHARED_SECRET=311606f4085d47d6b8cdd40793365d04d1f41435380644c8bd42a59dff2fc057
 Environment=IP_HASH_KEY=prelaunchqa-salt-key-2026-production-v1
+EnvironmentFile=-/opt/plq-worker/.env
 ExecStart=/usr/bin/node .output/server/index.mjs
 Restart=always
 RestartSec=5

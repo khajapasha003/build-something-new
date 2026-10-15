@@ -27,7 +27,21 @@ export NITRO_PRESET=node-server
 npm run build
 
 # 4. Configure & Start PreLaunchQA Web Server Service
-echo "[4/7] Enabling and restarting prelaunchqa-web systemd service..."
+echo "[4/7] Configuring environment and enabling prelaunchqa-web service..."
+if [ ! -f "$WORKER_DIR/.env" ]; then
+    cat << 'EOF' > "$WORKER_DIR/.env"
+NODE_ENV=production
+PORT=3000
+HOST=0.0.0.0
+APP_ORIGIN=https://prelaunchqa.com
+SUPABASE_URL=https://vdhhysfvuxmqtgdtvnez.supabase.co
+SUPABASE_PUBLISHABLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZkaGh5c2Z2dXhtcXRnZHR2bmV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjY3NDA1NzksImV4cCI6MjA0MjMxNjU3OX0.dummy
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZkaGh5c2Z2dXhtcXRnZHR2bmV6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyNjc0MDU3OSwiZXhwIjoyMDQyMzE2NTc5fQ.dummy
+WORKER_SHARED_SECRET=311606f4085d47d6b8cdd40793365d04d1f41435380644c8bd42a59dff2fc057
+IP_HASH_KEY=prelaunchqa-salt-key-2026-production-v1
+EOF
+    chmod 600 "$WORKER_DIR/.env"
+fi
 sudo cp "$WORKER_DIR/deploy/prelaunchqa-web.service" /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable --now prelaunchqa-web
