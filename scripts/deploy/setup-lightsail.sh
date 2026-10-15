@@ -16,14 +16,19 @@ echo "NPM version: $(npm -v)"
 
 # 2. Clone or update repository
 echo "[2/5] Setting up worker code in /opt/plq-worker..."
+sudo git config --global --add safe.directory /opt/plq-worker
+git config --global --add safe.directory /opt/plq-worker || true
+
 if [ -d "/opt/plq-worker/.git" ]; then
     echo "Updating existing repository..."
+    sudo chown -R $(whoami):$(whoami) /opt/plq-worker
     cd /opt/plq-worker
-    sudo git fetch origin main
-    sudo git reset --hard origin/main
+    git fetch origin main
+    git reset --hard origin/main
 else
     sudo rm -rf /opt/plq-worker
     sudo git clone https://github.com/khajapasha003/build-something-new.git /opt/plq-worker
+    sudo chown -R $(whoami):$(whoami) /opt/plq-worker
 fi
 
 cd /opt/plq-worker/worker
