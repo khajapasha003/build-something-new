@@ -3,15 +3,9 @@ import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-export const TICKET_CATEGORIES = [
-  "general",
-  "verification",
-  "scan_issue",
-  "billing",
-  "feature_request",
-] as const;
+import { TICKET_CATEGORIES, type TicketCategory } from "./support.constants";
 
-export type TicketCategory = (typeof TICKET_CATEGORIES)[number];
+export { TICKET_CATEGORIES, type TicketCategory };
 
 const submitTicketSchema = z.object({
   email: z.string().trim().email("Please provide a valid email address."),

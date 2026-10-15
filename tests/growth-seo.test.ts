@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 
-import { BILLING_PLANS } from "../src/lib/billing.functions.ts";
+import { BILLING_PLANS } from "../src/lib/billing.constants.ts";
 
 test("SEO: public/sitemap.xml exists and contains valid URLs", () => {
   const sitemapPath = path.resolve(process.cwd(), "public/sitemap.xml");

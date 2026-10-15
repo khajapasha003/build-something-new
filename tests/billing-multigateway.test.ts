@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { BILLING_PLANS } from "../src/lib/billing.functions.ts";
+import { BILLING_PLANS, SUPPORTED_PAYMENT_PROVIDERS } from "../src/lib/billing.constants.ts";
 
 test("B1: Billing plans include Sample, Launch, and Retest with correct pricing", () => {
   assert.equal(BILLING_PLANS.sample.price, 0);

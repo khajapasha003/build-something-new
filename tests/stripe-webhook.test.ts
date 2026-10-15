@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import crypto from "node:crypto";
 
-import { verifyStripeSignature } from "../src/routes/api/public/stripe/webhook.ts";
+import { verifyStripeSignature } from "../src/lib/stripe-sig.ts";
 
 function generateStripeSignature(payload: string, secret: string, timestamp: number): string {
   const signedPayload = `${timestamp}.${payload}`;

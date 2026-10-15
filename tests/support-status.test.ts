@@ -1,8 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { TICKET_CATEGORIES } from "../src/lib/support.functions.ts";
-import { BILLING_PLANS } from "../src/lib/billing.functions.ts";
+import { TICKET_CATEGORIES } from "../src/lib/support.constants.ts";
+import { BILLING_PLANS } from "../src/lib/billing.constants.ts";
 
 test("Support: ticket categories are defined and distinct", () => {
   assert.strictEqual(TICKET_CATEGORIES.length >= 5, true);
