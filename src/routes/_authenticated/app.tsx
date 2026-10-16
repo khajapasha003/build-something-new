@@ -220,7 +220,7 @@ function Dashboard() {
   const totalCheckPoints = totalBugsCaught + totalPassedChecks;
   const cleanPassRate = totalCheckPoints > 0 ? Math.round((totalPassedChecks / totalCheckPoints) * 100) : 100;
 
-  const [paymentProvider, setPaymentProvider] = useState<"stripe" | "paypal" | "razorpay">("stripe");
+  const [paymentProvider, setPaymentProvider] = useState<"stripe" | "paypal" | "razorpay">("paypal");
 
   async function onUpgrade(planId: "launch" | "retest") {
     setCheckingOut(planId);
@@ -934,8 +934,8 @@ function Dashboard() {
                 </p>
                 <div className="mt-2.5 grid grid-cols-3 gap-2.5">
                   {[
+                    { id: "paypal", label: "PayPal", icon: "🅿️", sub: "Live Active (Cards & Balance)" },
                     { id: "stripe", label: "Credit Card", icon: "💳", sub: "Global Cards" },
-                    { id: "paypal", label: "PayPal", icon: "🅿️", sub: "International" },
                     { id: "razorpay", label: "Razorpay", icon: "⚡", sub: "UPI / Netbanking" },
                   ].map((p) => (
                     <button
@@ -1026,7 +1026,7 @@ function Dashboard() {
 
               <div className="mt-6 border-t border-border/60 pt-4 text-center text-xs text-muted-foreground">
                 <p>
-                  🔒 Secure checkout powered by Stripe. 100% money-back guarantee if checks fail to run.
+                  🔒 Secure checkout powered by PayPal & Stripe (256-bit SSL). 100% money-back guarantee.
                 </p>
               </div>
             </div>

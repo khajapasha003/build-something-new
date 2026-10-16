@@ -117,14 +117,21 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
     const cancelUrl = data.cancelUrl || `${appOrigin}/app?checkout=cancelled`;
 
     // 1. PayPal Checkout Support
-    const paypalClientId = process.env.PAYPAL_CLIENT_ID;
-    const paypalClientSecret = process.env.PAYPAL_CLIENT_SECRET;
+    const paypalClientId =
+      process.env.PAYPAL_CLIENT_ID ||
+      "BAAQbuJ4U-sDckhSSMpNHl73JrDj8NSiTbSkrfaWRPDCuHziUqXMGmJhfuRT0_0J4oSF-b7imMNBnKUV0M";
+    const paypalClientSecret =
+      process.env.PAYPAL_CLIENT_SECRET ||
+      "EP39DpVYmB57RpMCbeKYSRDYUH674Whth7OtdHv-uhPUxMM5b5ohBpF41JmpWgmQ3jW_1Ms0ZBInotCD";
     const isPaypalLive = process.env.PAYPAL_ENV !== "sandbox";
     let paypalApiBase = isPaypalLive
       ? "https://api-m.paypal.com"
       : "https://api-m.sandbox.paypal.com";
 
-    if (data.provider === "paypal" && paypalClientId && paypalClientSecret) {
+    if (data.provider === "paypal") {
+      if (!paypalClientId || !paypalClientSecret) {
+        return { ok: false, error: "PayPal Live credentials not configured." };
+      }
       try {
         const authHeader = btoa(`${paypalClientId.trim()}:${paypalClientSecret.trim()}`);
         let tokenRes = await fetch(`${paypalApiBase}/v1/oauth2/token`, {
@@ -158,7 +165,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
         if (!tokenRes.ok) {
           const errText = await tokenRes.text();
           console.error("[PayPal Auth Failed]", errText);
-          throw new Error("Failed to authenticate with PayPal API (checked both Live and Sandbox)");
+          return { ok: false, error: "Failed to authenticate with PayPal API." };
         }
 
         const tokenData = (await tokenRes.json()) as { access_token: string };
@@ -213,6 +220,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
         if (approveLink?.href) {
           return { ok: true, url: approveLink.href, mode: "paypal", orderId: orderData.id };
         }
+        return { ok: false, error: "PayPal approval checkout link was not returned." };
       } catch (err: any) {
         console.error("[PayPal] Error:", err);
         return { ok: false, error: err.message || "Failed to initiate PayPal payment." };
@@ -403,8 +411,12 @@ export const capturePaypalOrder = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => capturePaypalInputSchema.parse(input))
   .handler(async ({ data, context }) => {
-    const paypalClientId = process.env.PAYPAL_CLIENT_ID;
-    const paypalClientSecret = process.env.PAYPAL_CLIENT_SECRET;
+    const paypalClientId =
+      process.env.PAYPAL_CLIENT_ID ||
+      "BAAQbuJ4U-sDckhSSMpNHl73JrDj8NSiTbSkrfaWRPDCuHziUqXMGmJhfuRT0_0J4oSF-b7imMNBnKUV0M";
+    const paypalClientSecret =
+      process.env.PAYPAL_CLIENT_SECRET ||
+      "EP39DpVYmB57RpMCbeKYSRDYUH674Whth7OtdHv-uhPUxMM5b5ohBpF41JmpWgmQ3jW_1Ms0ZBInotCD";
     const isPaypalLive = process.env.PAYPAL_ENV !== "sandbox";
     let paypalApiBase = isPaypalLive
       ? "https://api-m.paypal.com"
