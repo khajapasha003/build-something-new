@@ -4,11 +4,11 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export const BUILT_WITH = [
-  "Lovable",
+  "Next.js",
+  "React",
   "Bolt",
-  "Replit",
-  "v0",
   "Cursor",
+  "v0",
   "Hand-coded",
   "Other",
 ] as const;

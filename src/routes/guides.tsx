@@ -6,17 +6,17 @@ import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 export const Route = createFileRoute("/guides")({
   head: () => ({
     meta: [
-      { title: "AI Web App Pre-Launch QA Guides — Lovable, Bolt, Cursor & v0" },
+      { title: "Web App Pre-Launch QA Guides — Next.js, Bolt, Cursor & v0" },
       {
         name: "description",
         content:
-          "Complete pre-launch testing guides for AI-generated web apps. Learn how to catch console errors, broken routes, and network failures in Lovable, Bolt.new, Cursor, and v0 apps.",
+          "Complete pre-launch testing guides for modern web apps. Learn how to catch console errors, broken routes, and network failures in Next.js, Bolt.new, Cursor, and v0 apps.",
       },
-      { property: "og:title", content: "AI Web App Pre-Launch QA Guides — PreLaunchQA" },
+      { property: "og:title", content: "Web App Pre-Launch QA Guides — PreLaunchQA" },
       {
         property: "og:description",
         content:
-          "Catch silent browser errors and broken flows in your AI-built web app before launch.",
+          "Catch silent browser errors and broken flows in your web app before launch.",
       },
       { property: "og:type", content: "article" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -25,7 +25,7 @@ export const Route = createFileRoute("/guides")({
   component: GuidesPage,
 });
 
-type Platform = "lovable" | "bolt" | "cursor" | "v0";
+type Platform = "nextjs" | "bolt" | "cursor" | "v0";
 
 const GUIDES: Record<
   Platform,
@@ -37,17 +37,17 @@ const GUIDES: Record<
     checklist: string[];
   }
 > = {
-  lovable: {
-    name: "Lovable",
-    tagline: "Full-Stack App Testing Guide",
+  nextjs: {
+    name: "Next.js & React",
+    tagline: "Full-Stack Web App QA Guide",
     description:
-      "Lovable creates full-stack React and Vite applications with Supabase backends. While Lovable builds stunning UIs in seconds, runtime edge-cases like auth callback URLs and unhandled async mutations often slip into production.",
+      "Modern React and Next.js applications build fast, but runtime edge-cases like SSR hydration mismatches, auth redirect loops, and unhandled async mutations often slip into production.",
     commonFailures: [
       {
-        title: "Supabase Auth Callback URL Mismatches",
+        title: "Auth Callback & Redirect URI Mismatches",
         detail:
-          "When deploying to custom domains, the OAuth redirect URI often defaults to localhost or the Lovable staging URL, causing login flows to fail silently in production.",
-        fix: "Add your production origin to Supabase Authentication > URL Configuration > Redirect URLs, and run a PreLaunchQA check to verify OAuth redirects.",
+          "When deploying to custom domains, the OAuth redirect URI often defaults to localhost or staging URLs, causing login flows to fail silently in production.",
+        fix: "Configure your production origin in OAuth callback settings, and run a PreLaunchQA check to verify redirects.",
       },
       {
         title: "Unhandled React Query / Async State",
@@ -172,7 +172,7 @@ const GUIDES: Record<
 };
 
 function GuidesPage() {
-  const [activePlatform, setActivePlatform] = useState<Platform>("lovable");
+  const [activePlatform, setActivePlatform] = useState<Platform>("nextjs");
   const current = GUIDES[activePlatform];
 
   return (

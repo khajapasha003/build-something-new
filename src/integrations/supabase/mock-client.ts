@@ -18,7 +18,7 @@ const memoryStore: MockStore = {
       user_id: "demo_founder_001",
       url: "https://prelaunchqa.com",
       origin: "https://prelaunchqa.com",
-      built_with: "Lovable",
+      built_with: "Next.js",
       verification_status: "verified",
       verification_token: "plqa-verify-demo-token-12345",
       verified_at: new Date().toISOString(),

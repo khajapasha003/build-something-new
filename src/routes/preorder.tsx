@@ -52,7 +52,7 @@ const tiers = [
       "Full evidence bundle (screenshots & trace data)",
       "5 scan credits included",
       "1 included re-scan comparison diff",
-      "Direct AI fix prompts for Lovable/Bolt/Cursor",
+      "Direct AI fix prompts for Cursor/Bolt/Next.js",
       "Priority worker execution queue",
     ],
     cta: "Get launch pack",
@@ -180,7 +180,7 @@ function Preorder() {
               <div className="text-2xl mb-2">🤖</div>
               <h3 className="font-display text-sm font-bold text-foreground">1-Click Fix Prompts</h3>
               <p className="mt-1">
-                Every error includes an exact prompt for Lovable, Bolt, Cursor, or v0. Just copy and paste into your AI assistant.
+                Every error includes an exact prompt for Cursor, Bolt, or your AI assistant. Just copy and paste to resolve issues instantly.
               </p>
             </div>
             <div>

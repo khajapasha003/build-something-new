@@ -75,9 +75,10 @@ const STATUS_STYLES: Record<AppRow["verification_status"], { pill: string; dot: 
 };
 
 const PLATFORM_BADGES: Record<string, { label: string; badgeClass: string }> = {
-  Lovable: { label: "Lovable", badgeClass: "border-purple-500/30 bg-purple-500/10 text-purple-300" },
+  "Next.js": { label: "Next.js", badgeClass: "border-indigo-500/30 bg-indigo-500/10 text-indigo-300" },
+  React: { label: "React", badgeClass: "border-cyan-500/30 bg-cyan-500/10 text-cyan-300" },
   Bolt: { label: "Bolt.new", badgeClass: "border-amber-500/30 bg-amber-500/10 text-amber-300" },
-  Cursor: { label: "Cursor", badgeClass: "border-cyan-500/30 bg-cyan-500/10 text-cyan-300" },
+  Cursor: { label: "Cursor", badgeClass: "border-blue-500/30 bg-blue-500/10 text-blue-300" },
   v0: { label: "v0 / Next", badgeClass: "border-zinc-400/30 bg-zinc-400/10 text-zinc-200" },
   Windsurf: { label: "Windsurf", badgeClass: "border-emerald-500/30 bg-emerald-500/10 text-emerald-300" },
   Other: { label: "Web App", badgeClass: "border-slate-500/30 bg-slate-500/10 text-slate-300" },
@@ -144,7 +145,7 @@ function Dashboard() {
   const billingQuery = useQuery({ queryKey: ["billing"], queryFn: () => fetchBilling() });
 
   const [url, setUrl] = useState("");
-  const [builtWith, setBuiltWith] = useState<(typeof BUILT_WITH)[number]>("Lovable");
+  const [builtWith, setBuiltWith] = useState<(typeof BUILT_WITH)[number]>("Next.js");
   const [addError, setAddError] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
   const [openAppId, setOpenAppId] = useState<string | null>(null);
@@ -560,7 +561,7 @@ function Dashboard() {
               </div>
               <h3 className="mt-4 font-display text-base font-semibold">No web apps added yet</h3>
               <p className="mx-auto mt-1 max-w-sm text-xs text-muted-foreground">
-                Add your Lovable, Bolt, Cursor, or v0 web app above to run your first automated Chromium browser audit.
+                Add your web app above to run your first automated Chromium browser audit.
               </p>
             </div>
           ) : (
@@ -763,7 +764,7 @@ function Dashboard() {
                             value={`<meta name="prelaunchqa-verify" content="${token}">`}
                           />
                           <p className="text-xs text-muted-foreground">
-                            💡 In Lovable, Bolt, or Cursor: paste this into your root index.html or app layout file, then click "Verify Now" below.
+                            💡 Paste this meta tag into your root index.html or app layout file, then click "Verify Now" below.
                           </p>
                         </div>
                       )}

@@ -92,7 +92,7 @@ function InteractiveDevToolsPreview() {
         {/* Mock Address Bar */}
         <div className="flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-950/80 px-3 py-1 font-mono text-xs text-slate-300">
           <span className="size-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span>https://yourapp.lovable.app</span>
+          <span>https://yourapp.com</span>
           <span className="rounded bg-emerald-400/20 px-1 py-0.2 text-[10px] font-bold text-emerald-300">200 OK</span>
         </div>
 
@@ -231,7 +231,7 @@ function InteractiveDevToolsPreview() {
         {activeTab === "json" && (
           <pre className="rounded-xl border border-slate-800 bg-slate-900/80 p-4 text-[11px] text-emerald-400 overflow-x-auto">
 {`{
-  "target_url": "https://yourapp.lovable.app",
+  "target_url": "https://yourapp.com",
   "audit_version": "1.0-chromium-engine",
   "finished_at": "2026-10-15T20:30:12Z",
   "summary": {
@@ -381,7 +381,7 @@ function Index() {
                   2. Ready AI Fix Prompts
                 </h3>
                 <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                  Formatted prompts tailored for Lovable, Bolt, Cursor, or v0 so you can paste the finding directly into your AI tool to fix it in 30 seconds.
+                  Formatted prompts tailored for Cursor, Bolt, Next.js, or v0 so you can paste the finding directly into your AI tool to fix it in 30 seconds.
                 </p>
               </div>
               <div className="mt-6 rounded-xl border border-slate-800 bg-slate-900/80 p-2.5 font-mono text-[10px] text-primary">
@@ -438,18 +438,18 @@ function Index() {
         {/* Who Is This For — Platform Cards */}
         <section className="mx-auto max-w-6xl px-6 pb-20">
           <div className="text-center">
-            <h2 className="font-display text-2xl font-bold sm:text-4xl">Built for AI Builders Who Ship Fast</h2>
+            <h2 className="font-display text-2xl font-bold sm:text-4xl">Built for Modern Web Builders Who Ship Fast</h2>
             <p className="mx-auto mt-3 max-w-2xl text-sm text-muted-foreground">
-              AI code generation tools are amazing at producing prototypes. But runtime exceptions, broken redirects, and missing env vars only trigger when real users load the page.
+              Modern frontend code moves fast. But runtime exceptions, broken redirects, and missing env vars only trigger when real users load the page.
             </p>
           </div>
 
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
               {
-                tool: "Lovable",
-                accent: "border-purple-500/40 bg-purple-500/5 text-purple-300",
-                desc: "Full-stack apps generated from prompts. Catch Supabase auth callback mismatches and unhandled null object reads before launch.",
+                tool: "Next.js & React",
+                accent: "border-indigo-500/40 bg-indigo-500/5 text-indigo-300",
+                desc: "Full-stack web applications. Catch hydration mismatches, auth redirect loops, and unhandled null object reads before launch.",
               },
               {
                 tool: "Bolt.new",

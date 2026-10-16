@@ -82,7 +82,7 @@ export function SignupForm({ intent, submitLabel, successMessage }: Props) {
         <span className="mb-1.5 block text-muted-foreground">Built with</span>
         <select
           name="builder"
-          defaultValue="Lovable"
+          defaultValue="Next.js"
           className="w-full rounded-xl border border-input bg-secondary/60 px-4 py-3 text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-ring/40"
         >
           {BUILDERS.map((builder) => (

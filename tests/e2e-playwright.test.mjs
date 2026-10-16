@@ -126,7 +126,7 @@ if (chromium) {
   const guidesRes = await fetch(`${baseUrl}/guides`);
   assertCheck("Guides page returns HTTP 200", guidesRes.status === 200);
   const guidesHtml = await guidesRes.text();
-  assertCheck("AI platform guides rendered", guidesHtml.includes("Lovable") || guidesHtml.includes("Bolt"));
+  assertCheck("Platform guides rendered", guidesHtml.includes("Next.js") || guidesHtml.includes("Bolt"));
 }
 
 // TEST 5: API Endpoints (Version & Badge)

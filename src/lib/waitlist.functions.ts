@@ -4,7 +4,7 @@ import { z } from "zod";
 
 import { processSignup, type WaitlistDb } from "./waitlist.service.ts";
 
-export const BUILDERS = ["Lovable", "Bolt", "Replit", "v0", "Cursor", "Other"] as const;
+export const BUILDERS = ["Next.js", "React", "Bolt", "v0", "Cursor", "Other"] as const;
 
 const signupSchema = z.object({
   email: z.string().trim().email().max(254),

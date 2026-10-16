@@ -20,7 +20,7 @@ async function plainSha256(value: string): Promise<string> {
 const samplePayload: SignupPayload = {
   email: "test@example.com",
   websiteUrl: "https://example.com",
-  builder: "Lovable",
+  builder: "Next.js",
   consentMarketing: true,
   intent: "waitlist",
 };
