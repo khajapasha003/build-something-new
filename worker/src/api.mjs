@@ -10,7 +10,7 @@ function required(name) {
 }
 
 export const config = {
-  apiBase: () => (process.env.PLQ_API_BASE || "https://prelaunchqa.com").replace(/\/+$/, ""),
+  apiBase: () => (process.env.PLQ_API_BASE || "http://127.0.0.1:3000").replace(/\/+$/, ""),
   secret: () =>
     process.env.WORKER_SHARED_SECRET ||
     "311606f4085d47d6b8cdd40793365d04d1f41435380644c8bd42a59dff2fc057",

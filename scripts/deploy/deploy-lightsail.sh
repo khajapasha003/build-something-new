@@ -62,6 +62,13 @@ sudo systemctl restart nginx
 # 6. Configure & Restart PreLaunchQA Chromium Scan Worker
 echo "[6/7] Updating and restarting Chromium Scan Worker..."
 cd "$WORKER_DIR/worker"
+cat << 'EOF' > "$WORKER_DIR/worker/.env"
+PLQ_API_BASE=http://127.0.0.1:3000
+WORKER_SHARED_SECRET=311606f4085d47d6b8cdd40793365d04d1f41435380644c8bd42a59dff2fc057
+WORKER_ID=lightsail-ap-south-1
+POLL_INTERVAL_SECONDS=10
+EOF
+chmod 600 "$WORKER_DIR/worker/.env"
 npm install
 sudo cp "$WORKER_DIR/worker/deploy/prelaunchqa-worker.service" /etc/systemd/system/
 sudo systemctl daemon-reload
