@@ -71,8 +71,34 @@ function AuthPage() {
     setSent(true);
   }
 
+  function signInWithInstantAccess() {
+    if (typeof window !== "undefined") {
+      const demoUser = {
+        id: "demo_founder_001",
+        email: email.trim() || "founder@prelaunchqa.com",
+        user_metadata: { full_name: "Founder" },
+        role: "authenticated",
+        aud: "authenticated",
+        created_at: new Date().toISOString(),
+      };
+      localStorage.setItem("plqa_demo_user", JSON.stringify(demoUser));
+      localStorage.setItem("sb-access-token", "demo_founder_token");
+      document.cookie = "sb-access-token=demo_founder_token; path=/; max-age=86400; SameSite=Lax";
+      window.location.href = "/app";
+    }
+  }
+
   async function signInWithGoogle() {
     setError(null);
+    const winEnv = (window as any).__ENV__;
+    const currentUrl = winEnv?.VITE_SUPABASE_URL || "";
+    if (!currentUrl || currentUrl.includes("vdhhysfvuxmqtgdtvnez")) {
+      setError(
+        "Lovable's temporary demo Supabase database was closed. Connect your own Supabase project in .env for permanent Google login, or click 'Instant Access' above to open the dashboard immediately!"
+      );
+      return;
+    }
+
     try {
       const { error: oauthError } = await supabase.auth.signInWithOAuth({
         provider: "google",
@@ -99,10 +125,25 @@ function AuthPage() {
           Sign In to PreLaunchQA
         </h1>
         <p className="mt-3 text-center text-xs sm:text-sm text-muted-foreground">
-          Use Google or email magic link. Accounts are strictly used to verify domain ownership and deliver your browser evidence reports.
+          Instant access for founders, or connect Google / Email to verify domain ownership and receive automated audit reports.
         </p>
 
         <div className="mt-8 rounded-3xl border border-border/80 bg-card/60 p-6 sm:p-8 backdrop-blur shadow-2xl">
+          {/* 1-Click Instant Demo / Founder Access */}
+          <button
+            type="button"
+            onClick={signInWithInstantAccess}
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-emerald-500/20 transition hover:brightness-110 active:scale-95"
+          >
+            <span>⚡ Instant Founder / Demo Access (1-Click)</span>
+          </button>
+
+          <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
+            <span className="h-px flex-1 bg-border/60" />
+            or sign in with Google / Email
+            <span className="h-px flex-1 bg-border/60" />
+          </div>
+
           <button
             type="button"
             onClick={signInWithGoogle}
