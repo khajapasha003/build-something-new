@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,6 +16,7 @@ import {
 } from "@/lib/apps.functions";
 import {
   BILLING_PLANS,
+  capturePaypalOrder,
   createCheckoutSession,
   getBillingOverview,
 } from "@/lib/billing.functions";
@@ -135,6 +136,50 @@ function Dashboard() {
   const stopScan = useServerFn(cancelScan);
   const fetchBilling = useServerFn(getBillingOverview);
   const checkoutFn = useServerFn(createCheckoutSession);
+  const capturePaypalFn = useServerFn(capturePaypalOrder);
+
+  const [paypalSettlement, setPaypalSettlement] = useState<{
+    status: "processing" | "success" | "error";
+    message: string;
+  } | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const checkout = params.get("checkout");
+    const gateway = params.get("gateway");
+    const orderId = params.get("token") || params.get("orderId");
+    const planId = (params.get("plan") as "launch" | "retest") || "launch";
+
+    if (checkout === "success" && gateway === "paypal" && orderId) {
+      setPaypalSettlement({
+        status: "processing",
+        message: "Securing and verifying your PayPal transaction...",
+      });
+      capturePaypalFn({ data: { orderId, planId } })
+        .then((res) => {
+          if (res.ok) {
+            setPaypalSettlement({
+              status: "success",
+              message: `🎉 PayPal payment verified! Your ${planId === "launch" ? "Launch Checks (5 credits)" : "Monthly Re-test plan"} has been activated.`,
+            });
+            void queryClient.invalidateQueries({ queryKey: ["billing"] });
+            window.history.replaceState({}, document.title, window.location.pathname);
+          } else {
+            setPaypalSettlement({
+              status: "error",
+              message: res.error || "Could not finalize PayPal transaction.",
+            });
+          }
+        })
+        .catch((err) => {
+          setPaypalSettlement({
+            status: "error",
+            message: err.message || "Failed to finalize PayPal payment.",
+          });
+        });
+    }
+  }, [capturePaypalFn, queryClient]);
 
   const appsQuery = useQuery({ queryKey: ["apps"], queryFn: () => fetchApps() });
   const scansQuery = useQuery({
@@ -257,6 +302,34 @@ function Dashboard() {
       <SiteHeader />
 
       <main className="mx-auto max-w-6xl px-6 py-10 sm:py-14">
+        {paypalSettlement && (
+          <div
+            className={`mb-6 flex items-center justify-between rounded-2xl border p-4 text-sm font-medium shadow-sm transition-all ${
+              paypalSettlement.status === "processing"
+                ? "border-amber/40 bg-amber/10 text-amber"
+                : paypalSettlement.status === "success"
+                ? "border-mint/40 bg-mint/10 text-mint"
+                : "border-coral/40 bg-coral/10 text-coral"
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <span>
+                {paypalSettlement.status === "processing" && "⏳"}
+                {paypalSettlement.status === "success" && "✅"}
+                {paypalSettlement.status === "error" && "⚠️"}
+              </span>
+              <span>{paypalSettlement.message}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setPaypalSettlement(null)}
+              className="rounded-lg px-2 py-1 text-xs opacity-75 hover:bg-black/10 hover:opacity-100"
+            >
+              Dismiss ✕
+            </button>
+          </div>
+        )}
+
         {/* Top Header & Quick Profile Info */}
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/60 pb-8">
           <div>

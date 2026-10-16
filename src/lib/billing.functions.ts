@@ -393,3 +393,133 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       mode: "test",
     };
   });
+
+const capturePaypalInputSchema = z.object({
+  orderId: z.string(),
+  planId: z.enum(["launch", "retest"]),
+});
+
+export const capturePaypalOrder = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => capturePaypalInputSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const paypalClientId = process.env.PAYPAL_CLIENT_ID;
+    const paypalClientSecret = process.env.PAYPAL_CLIENT_SECRET;
+    const isPaypalLive = process.env.PAYPAL_ENV !== "sandbox";
+    let paypalApiBase = isPaypalLive
+      ? "https://api-m.paypal.com"
+      : "https://api-m.sandbox.paypal.com";
+
+    if (!paypalClientId || !paypalClientSecret) {
+      return { ok: false, error: "PayPal credentials not configured on server" };
+    }
+
+    try {
+      const authHeader = btoa(`${paypalClientId.trim()}:${paypalClientSecret.trim()}`);
+      let tokenRes = await fetch(`${paypalApiBase}/v1/oauth2/token`, {
+        method: "POST",
+        headers: {
+          Authorization: `Basic ${authHeader}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: "grant_type=client_credentials",
+      });
+
+      if (!tokenRes.ok) {
+        const fallbackBase = isPaypalLive
+          ? "https://api-m.sandbox.paypal.com"
+          : "https://api-m.paypal.com";
+        const retryRes = await fetch(`${fallbackBase}/v1/oauth2/token`, {
+          method: "POST",
+          headers: {
+            Authorization: `Basic ${authHeader}`,
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: "grant_type=client_credentials",
+        });
+        if (retryRes.ok) {
+          tokenRes = retryRes;
+          paypalApiBase = fallbackBase;
+        }
+      }
+
+      if (!tokenRes.ok) {
+        return { ok: false, error: "Failed to authenticate with PayPal API" };
+      }
+
+      const tokenData = (await tokenRes.json()) as { access_token: string };
+      const captureRes = await fetch(
+        `${paypalApiBase}/v2/checkout/orders/${encodeURIComponent(data.orderId)}/capture`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${tokenData.access_token}`,
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      const captureData = (await captureRes.json()) as any;
+      const status = captureData.status;
+
+      if (!captureRes.ok && captureData?.details?.[0]?.issue !== "ORDER_ALREADY_CAPTURED") {
+        console.error("[PayPal Capture Error]", captureData);
+        return {
+          ok: false,
+          error: captureData?.message || "PayPal capture could not be completed.",
+        };
+      }
+
+      // Record successful order
+      await context.supabase
+        .from("orders")
+        .update({
+          status: "succeeded",
+          stripe_session_id: `paypal_${data.orderId}`,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("user_id", context.userId)
+        .eq("plan", data.planId);
+
+      // Fulfill credits
+      if (data.planId === "launch") {
+        const { data: existing } = await context.supabase
+          .from("user_credits")
+          .select("scan_credits")
+          .eq("user_id", context.userId)
+          .maybeSingle();
+
+        const newCredits = (existing?.scan_credits ?? 1) + 5;
+        await context.supabase.from("user_credits").upsert({
+          user_id: context.userId,
+          plan: "launch",
+          scan_credits: newCredits,
+          unlimited_scans: false,
+          updated_at: new Date().toISOString(),
+        });
+      } else if (data.planId === "retest") {
+        await context.supabase.from("user_credits").upsert({
+          user_id: context.userId,
+          plan: "retest",
+          scan_credits: 999,
+          unlimited_scans: true,
+          updated_at: new Date().toISOString(),
+        });
+
+        await context.supabase.from("subscriptions").insert({
+          user_id: context.userId,
+          plan: "retest",
+          status: "active",
+          current_period_start: new Date().toISOString(),
+          current_period_end: new Date(Date.now() + 30 * 86400 * 1000).toISOString(),
+          cancel_at_period_end: false,
+        });
+      }
+
+      return { ok: true, status: "COMPLETED", planId: data.planId };
+    } catch (err: any) {
+      console.error("[PayPal Capture Exception]", err);
+      return { ok: false, error: err.message || "Failed to capture PayPal payment" };
+    }
+  });
+
