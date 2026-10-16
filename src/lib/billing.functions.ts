@@ -128,9 +128,78 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       ? "https://api-m.paypal.com"
       : "https://api-m.sandbox.paypal.com";
 
-    if (data.provider === "paypal") {
+    // Check if direct Stripe is configured
+    const stripeKey = process.env.STRIPE_SECRET_KEY;
+    const shouldUseStripe = data.provider === "stripe" && Boolean(stripeKey && stripeKey.trim().length > 0);
+
+    // 1. Direct Stripe Checkout (when STRIPE_SECRET_KEY is configured)
+    if (shouldUseStripe && stripeKey) {
+      try {
+        const isSubscription = selectedPlan.type === "subscription";
+        const bodyParams = new URLSearchParams();
+        bodyParams.append("client_reference_id", context.userId);
+        bodyParams.append("customer_email", context.session.user.email ?? "");
+        bodyParams.append("mode", isSubscription ? "subscription" : "payment");
+        bodyParams.append("success_url", successUrl);
+        bodyParams.append("cancel_url", cancelUrl);
+        bodyParams.append("metadata[userId]", context.userId);
+        bodyParams.append("metadata[planId]", data.planId);
+
+        bodyParams.append("line_items[0][price_data][currency]", "usd");
+        bodyParams.append(
+          "line_items[0][price_data][product_data][name]",
+          `PreLaunchQA - ${selectedPlan.name}`,
+        );
+        bodyParams.append(
+          "line_items[0][price_data][product_data][description]",
+          selectedPlan.description,
+        );
+        bodyParams.append(
+          "line_items[0][price_data][unit_amount]",
+          selectedPlan.price.toString(),
+        );
+        if (isSubscription) {
+          bodyParams.append("line_items[0][price_data][recurring][interval]", "month");
+        }
+        bodyParams.append("line_items[0][quantity]", "1");
+
+        const stripeRes = await fetch("https://api.stripe.com/v1/checkout/sessions", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${stripeKey.trim()}`,
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: bodyParams.toString(),
+        });
+
+        if (!stripeRes.ok) {
+          const errData = await stripeRes.json().catch(() => ({}));
+          console.error("Stripe Checkout Error:", errData);
+          return { ok: false, error: "Payment processor returned an error. Please try again." };
+        }
+
+        const stripeSession = (await stripeRes.json()) as { id: string; url: string };
+
+        await context.supabase.from("orders").insert({
+          user_id: context.userId,
+          stripe_session_id: stripeSession.id,
+          plan: data.planId,
+          amount: selectedPlan.price,
+          currency: "usd",
+          status: "pending",
+        });
+
+        return { ok: true, url: stripeSession.url, mode: "stripe" };
+      } catch (err) {
+        console.error("Failed to connect to Stripe:", err);
+        return { ok: false, error: "Payment connection error. Please try again." };
+      }
+    }
+
+    // 2. PayPal / Global Credit & Debit Card Checkout (Official Live Engine)
+    if (data.provider === "paypal" || data.provider === "stripe") {
       if (!paypalClientId || !paypalClientSecret) {
-        return { ok: false, error: "PayPal Live credentials not configured." };
+        return { ok: false, error: "PayPal / Card payment credentials are not configured." };
       }
       try {
         const authHeader = btoa(`${paypalClientId.trim()}:${paypalClientSecret.trim()}`);
@@ -227,11 +296,18 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       }
     }
 
-    // 2. Razorpay Checkout Support
+    // 3. Razorpay Checkout Support (UPI, Netbanking & RuPay)
     const razorpayKeyId = process.env.RAZORPAY_KEY_ID;
     const razorpayKeySecret = process.env.RAZORPAY_KEY_SECRET;
 
-    if (data.provider === "razorpay" && razorpayKeyId && razorpayKeySecret) {
+    if (data.provider === "razorpay") {
+      if (!razorpayKeyId || !razorpayKeySecret) {
+        return {
+          ok: false,
+          error:
+            "Razorpay (UPI / Netbanking) is waiting for merchant API keys. To pay immediately with Credit Cards or PayPal, please select the PayPal / Cards option.",
+        };
+      }
       try {
         const authHeader = btoa(`${razorpayKeyId}:${razorpayKeySecret}`);
         const rzpRes = await fetch("https://api.razorpay.com/v1/orders", {
@@ -281,124 +357,9 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       }
     }
 
-    // 3. Stripe Checkout Session Support
-    const stripeKey = process.env.STRIPE_SECRET_KEY;
-    if (data.provider === "stripe" && stripeKey && stripeKey.trim().length > 0) {
-      try {
-        const isSubscription = selectedPlan.type === "subscription";
-        const bodyParams = new URLSearchParams();
-        bodyParams.append("client_reference_id", context.userId);
-        bodyParams.append("customer_email", context.session.user.email ?? "");
-        bodyParams.append("mode", isSubscription ? "subscription" : "payment");
-        bodyParams.append("success_url", successUrl);
-        bodyParams.append("cancel_url", cancelUrl);
-        bodyParams.append("metadata[userId]", context.userId);
-        bodyParams.append("metadata[planId]", data.planId);
-
-        bodyParams.append("line_items[0][price_data][currency]", "usd");
-        bodyParams.append(
-          "line_items[0][price_data][product_data][name]",
-          `PreLaunchQA - ${selectedPlan.name}`,
-        );
-        bodyParams.append(
-          "line_items[0][price_data][product_data][description]",
-          selectedPlan.description,
-        );
-        bodyParams.append(
-          "line_items[0][price_data][unit_amount]",
-          selectedPlan.price.toString(),
-        );
-        if (isSubscription) {
-          bodyParams.append("line_items[0][price_data][recurring][interval]", "month");
-        }
-        bodyParams.append("line_items[0][quantity]", "1");
-
-        const stripeRes = await fetch("https://api.stripe.com/v1/checkout/sessions", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${stripeKey.trim()}`,
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: bodyParams.toString(),
-        });
-
-        if (!stripeRes.ok) {
-          const errData = await stripeRes.json().catch(() => ({}));
-          console.error("Stripe Checkout Error:", errData);
-          return { ok: false, error: "Payment processor returned an error. Please try again." };
-        }
-
-        const stripeSession = (await stripeRes.json()) as { id: string; url: string };
-
-        await context.supabase.from("orders").insert({
-          user_id: context.userId,
-          stripe_session_id: stripeSession.id,
-          plan: data.planId,
-          amount: selectedPlan.price,
-          currency: "usd",
-          status: "pending",
-        });
-
-        return { ok: true, url: stripeSession.url, mode: "stripe" };
-      } catch (err) {
-        console.error("Failed to connect to Stripe:", err);
-        return { ok: false, error: "Payment connection error. Please try again." };
-      }
-    }
-
-    // 2. Fallback / Test Sandbox Mode (when awaiting payment provider merchant account review)
-    // Directly provision the test plan for developer / reviewer preview
-    const { data: order } = await context.supabase
-      .from("orders")
-      .insert({
-        user_id: context.userId,
-        plan: data.planId,
-        amount: selectedPlan.price,
-        currency: "usd",
-        status: "succeeded",
-      })
-      .select("id")
-      .single();
-
-    // Update user credits
-    if (data.planId === "launch") {
-      const { data: existing } = await context.supabase
-        .from("user_credits")
-        .select("scan_credits")
-        .eq("user_id", context.userId)
-        .maybeSingle();
-
-      const newCredits = (existing?.scan_credits ?? 1) + 5;
-      await context.supabase.from("user_credits").upsert({
-        user_id: context.userId,
-        plan: "launch",
-        scan_credits: newCredits,
-        unlimited_scans: false,
-        updated_at: new Date().toISOString(),
-      });
-    } else if (data.planId === "retest") {
-      await context.supabase.from("user_credits").upsert({
-        user_id: context.userId,
-        plan: "retest",
-        scan_credits: 999,
-        unlimited_scans: true,
-        updated_at: new Date().toISOString(),
-      });
-
-      await context.supabase.from("subscriptions").insert({
-        user_id: context.userId,
-        plan: "retest",
-        status: "active",
-        current_period_start: new Date().toISOString(),
-        current_period_end: new Date(Date.now() + 30 * 86400 * 1000).toISOString(),
-        cancel_at_period_end: false,
-      });
-    }
-
     return {
-      ok: true,
-      url: `${successUrl}&orderId=${order?.id ?? "test"}&mode=sandbox`,
-      mode: "test",
+      ok: false,
+      error: "Selected payment provider is not configured. Please use PayPal / Credit Card.",
     };
   });
 
