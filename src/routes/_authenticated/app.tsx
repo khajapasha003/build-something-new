@@ -179,6 +179,14 @@ function Dashboard() {
           });
         });
     }
+
+    if (checkout === "cancelled") {
+      setPaypalSettlement({
+        status: "error",
+        message: "PayPal checkout was cancelled or redirected. Note: In PayPal Live mode, a merchant cannot purchase from their own PayPal account/email. Test with a different card/account or in Incognito mode.",
+      });
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
   }, [capturePaypalFn, queryClient]);
 
   const appsQuery = useQuery({ queryKey: ["apps"], queryFn: () => fetchApps() });
