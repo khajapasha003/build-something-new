@@ -23,6 +23,7 @@ git reset --hard origin/main
 # 3. Install root dependencies and build standalone Node server
 echo "[3/7] Building standalone Node.js server..."
 npm install
+sudo rm -rf "$WORKER_DIR/.output"
 export NITRO_PRESET=node-server
 npm run build
 
