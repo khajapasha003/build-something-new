@@ -42,17 +42,36 @@ IP_HASH_KEY=prelaunchqa-salt-key-2026-production-v1
 EOF
     chmod 600 "$WORKER_DIR/.env"
 fi
+
+# Ensure PayPal configuration exists in .env
+if ! grep -q "PAYPAL_CLIENT_ID" "$WORKER_DIR/.env"; then
+    cat << 'EOF' >> "$WORKER_DIR/.env"
+PAYPAL_CLIENT_ID=BAAPL9AwNKtuLhhibh52o-qiwBWymOnP8pDTXU6hmJIJVaKyUXF9JMgGz-hM686FvOW36W7MHn0zuSrEQE
+PAYPAL_CLIENT_SECRET=EHwdl_Mhr5mBToXgOtmAENjgFQIVnaaqpUjJhs7vOza2VR0AjwhVwdrRBF6B8TFYumK-vv0PvGTrtFNV
+PAYPAL_ENV=sandbox
+EOF
+fi
+
 sudo cp "$WORKER_DIR/deploy/prelaunchqa-web.service" /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable --now prelaunchqa-web
 sudo systemctl restart prelaunchqa-web
 
-# 5. Configure Nginx reverse proxy
-echo "[5/7] Configuring Nginx reverse proxy on port 80..."
+# 5. Configure Nginx reverse proxy on port 80 & 443
+echo "[5/7] Configuring Nginx reverse proxy on port 80 & 443..."
 if ! command -v nginx >/dev/null 2>&1; then
     sudo apt-get update -y
-    sudo apt-get install -y nginx
+    sudo apt-get install -y nginx ssl-cert openssl
 fi
+
+if [ ! -f /etc/ssl/certs/prelaunchqa-selfsigned.crt ]; then
+    echo "Generating self-signed SSL certificate for port 443..."
+    sudo openssl req -x509 -nodes -days 3650 -newkey rsa:2048 \
+      -keyout /etc/ssl/private/prelaunchqa-selfsigned.key \
+      -out /etc/ssl/certs/prelaunchqa-selfsigned.crt \
+      -subj "/CN=prelaunchqa.com"
+fi
+
 sudo cp "$WORKER_DIR/deploy/nginx-prelaunchqa.conf" /etc/nginx/sites-available/prelaunchqa
 sudo ln -sf /etc/nginx/sites-available/prelaunchqa /etc/nginx/sites-enabled/prelaunchqa
 sudo rm -f /etc/nginx/sites-enabled/default

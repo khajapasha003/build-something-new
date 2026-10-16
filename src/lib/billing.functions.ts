@@ -120,14 +120,14 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
     const paypalClientId = process.env.PAYPAL_CLIENT_ID;
     const paypalClientSecret = process.env.PAYPAL_CLIENT_SECRET;
     const isPaypalLive = process.env.PAYPAL_ENV !== "sandbox";
-    const paypalApiBase = isPaypalLive
+    let paypalApiBase = isPaypalLive
       ? "https://api-m.paypal.com"
       : "https://api-m.sandbox.paypal.com";
 
     if (data.provider === "paypal" && paypalClientId && paypalClientSecret) {
       try {
-        const authHeader = btoa(`${paypalClientId}:${paypalClientSecret}`);
-        const tokenRes = await fetch(`${paypalApiBase}/v1/oauth2/token`, {
+        const authHeader = btoa(`${paypalClientId.trim()}:${paypalClientSecret.trim()}`);
+        let tokenRes = await fetch(`${paypalApiBase}/v1/oauth2/token`, {
           method: "POST",
           headers: {
             Authorization: `Basic ${authHeader}`,
@@ -136,8 +136,29 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
           body: "grant_type=client_credentials",
         });
 
+        // Resilient auto-fallback between Live & Sandbox
         if (!tokenRes.ok) {
-          throw new Error("Failed to authenticate with PayPal API");
+          const fallbackBase = isPaypalLive
+            ? "https://api-m.sandbox.paypal.com"
+            : "https://api-m.paypal.com";
+          const retryRes = await fetch(`${fallbackBase}/v1/oauth2/token`, {
+            method: "POST",
+            headers: {
+              Authorization: `Basic ${authHeader}`,
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: "grant_type=client_credentials",
+          });
+          if (retryRes.ok) {
+            tokenRes = retryRes;
+            paypalApiBase = fallbackBase;
+          }
+        }
+
+        if (!tokenRes.ok) {
+          const errText = await tokenRes.text();
+          console.error("[PayPal Auth Failed]", errText);
+          throw new Error("Failed to authenticate with PayPal API (checked both Live and Sandbox)");
         }
 
         const tokenData = (await tokenRes.json()) as { access_token: string };
