@@ -13,6 +13,9 @@ export function SiteHeader() {
           <Link to="/guides" className="transition hover:text-foreground">
             Guides
           </Link>
+          <Link to="/presentation" className="transition hover:text-foreground">
+            Presentation
+          </Link>
           <Link to="/preorder" className="transition hover:text-foreground">
             Pricing
           </Link>
@@ -57,6 +60,9 @@ export function SiteFooter() {
           </p>
         </div>
         <nav className="flex flex-wrap gap-5 text-xs font-medium">
+          <Link to="/presentation" className="transition hover:text-foreground">
+            Presentation
+          </Link>
           <Link to="/guides" className="transition hover:text-foreground">
             Guides
           </Link>
