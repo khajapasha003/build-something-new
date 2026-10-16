@@ -405,7 +405,11 @@ function PresentationPage() {
         {/* PRINT ONLY: Renders all slides on separate pages for PDF download */}
         <div className="hidden print:block space-y-12">
           {SLIDES.map((s) => (
-            <div key={s.id} className="p-8 border border-slate-300 rounded-2xl page-break-after">
+            <div
+              key={s.id}
+              className="p-8 border border-slate-300 rounded-2xl break-after-page mb-8"
+              style={{ breakAfter: "page", pageBreakAfter: "always" }}
+            >
               <div className="flex justify-between items-center mb-4">
                 <span className="font-mono text-xs font-bold text-slate-600">{s.tag}</span>
                 <span className="font-mono text-xs text-slate-500">Slide {s.id} / {SLIDES.length}</span>
